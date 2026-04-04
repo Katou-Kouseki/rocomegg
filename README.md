@@ -14,7 +14,7 @@
 - **Vite**：开发与构建工具
 - **Element Plus**：UI 组件库
 - **JSON（public/data）**：静态数据存储
-- **GitHub Pages**：静态站部署
+- **GitHub Pages + GitHub Actions**：自动部署
 
 ---
 
@@ -22,17 +22,22 @@
 
 ```text
 rock-egg-table/
+├─ .github/
+│  ├─ dependabot.yml
+│  └─ workflows/
+│     └─ deploy-pages.yml          # GitHub Actions 自动部署工作流
 ├─ public/
 │  ├─ rocom.ico
 │  └─ data/
-│     ├─ creatures-master-list.json        # 精灵主清单（id + name）
-│     └─ egg-measurements-final.json       # 精灵蛋直径/重量与精灵对照数据（正式）
+│     ├─ creatures-master-list.json
+│     └─ egg-measurements-final.json
 ├─ src/
 │  ├─ App.vue
 │  ├─ main.js
 │  └─ style.css
 ├─ index.html
 ├─ vite.config.js
+├─ LICENSE
 └─ package.json
 ```
 
@@ -56,47 +61,57 @@ npm run dev
 
 默认地址：`http://localhost:5173/`
 
----
-
-## 4. 构建与预览
-
-### 生产构建
+### 本地构建与预览
 
 ```bash
 npm run build
-```
-
-### 本地预览构建结果
-
-```bash
 npm run preview
 ```
 
 ---
 
-## 5. GitHub Pages 部署
+## 4. GitHub Actions 自动部署（推荐）
 
-本项目使用 `gh-pages` 发布 `dist` 目录到 `gh-pages` 分支。
+本项目使用 **GitHub Actions 自动发布到 GitHub Pages**。  
+以后只需要 `git push` 到 `main`，GitHub 会自动构建并部署。
 
-### 一键部署
-
-```bash
-npm run deploy
-```
-
-### GitHub 仓库 Pages 设置
+### 4.1 首次配置（只做一次）
 
 进入仓库：
 
 `Settings -> Pages -> Build and deployment`
 
-- Source: `Deploy from a branch`
-- Branch: `gh-pages`
-- Folder: `/(root)`
+- Source 选择：`GitHub Actions`
+
+然后检查仓库权限：
+
+`Settings -> Actions -> General`
+
+- Workflow permissions 选择：`Read and write permissions`
+- 勾选：`Allow GitHub Actions to create and approve pull requests`（可选）
+
+### 4.2 自动部署触发方式
+
+以下行为会触发自动部署：
+
+- Push 到 `main` 分支
+- 在 GitHub Actions 页面手动运行 workflow（若配置了 `workflow_dispatch`）
 
 ---
 
-## 6. 重要配置说明（务必检查）
+## 5. 手动部署（兼容旧流程）
+
+项目仍保留了 `gh-pages` 脚本，如需手动发布可执行：
+
+```bash
+npm run deploy
+```
+
+> 建议优先使用 GitHub Actions 自动部署，减少人工操作。
+
+---
+
+## 6. 重要配置说明
 
 ### `vite.config.js` 中 `base` 必须与仓库名一致
 
@@ -122,10 +137,6 @@ base: '/rocomegg/'
 - 直径单位：`m`
 - 重量单位：`kg`
 - 范围支持格式：如 `0.45~0.65`、`1.17-1.25`、`3.2`
-- 更新数据后执行：
-  1. `npm run build`
-  2. 本地确认页面无报错
-  3. `npm run deploy`
 
 ---
 
@@ -135,7 +146,7 @@ base: '/rocomegg/'
 
 - `public/rocom.ico`
 
-若要替换图标，直接覆盖该文件并重新部署。
+若要替换图标，直接覆盖该文件并推送到 `main`，Actions 会自动发布。
 
 ---
 
@@ -143,32 +154,30 @@ base: '/rocomegg/'
 
 ### Q1：页面提示“数据加载失败，请检查 public/data/*.json”
 常见原因：
-- Pages 子路径下资源地址错误
-- 数据文件名不一致
+
 - `base` 配置与仓库名不一致
+- 数据文件名或路径错误
+- 部署尚未完成或缓存未刷新
 
-请优先检查：
-1. `vite.config.js` 中 `base`
-2. `public/data` 下 JSON 文件是否存在
-3. 部署后是否已刷新缓存（`Ctrl + F5`）
+建议排查：
 
-### Q2：部署成功但页面是旧内容
-- 再执行一次 `npm run deploy`
-- 等待 1~5 分钟
-- 浏览器强刷
+1. 检查 `vite.config.js` 的 `base`
+2. 检查 `public/data` 文件是否存在
+3. 查看 `Actions` 页面是否构建成功
+4. 浏览器强刷（`Ctrl + F5`）
+
+### Q2：推送后页面没更新
+- 打开 `Actions` 页面确认 workflow 是否完成
+- 等待 1~3 分钟后再访问
+- 强刷浏览器缓存
+
+### Q3：自定义域名如何绑定
+1. 域名服务商添加 DNS（通常为 `CNAME -> mfskys.github.io`）
+2. GitHub `Settings -> Pages` 填写 `Custom domain`
+3. 仓库中添加 `public/CNAME`（内容为你的域名）
 
 ---
 
-## 10. 开发建议（可选）
-
-- 开启 GitHub 安全提醒：`Settings -> Security -> Dependabot alerts`
-- 可在后续改为 GitHub Actions 自动部署，减少手动部署步骤
-- 建议新增 issue 模板用于记录数据修正与命名映射
-
----
-
-## 11. License
+## 10. License
 
 本项目使用 **MIT License**。
-
----
