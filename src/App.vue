@@ -284,8 +284,8 @@ onMounted(loadDataset)
 <template>
   <div class="page">
     <header class="hero">
-      <h1>洛克王国世界宠物蛋查询</h1>
-      <p>输入蛋直径（m）和蛋重量（kg），查询可能孵化的候选宠物</p>
+      <h1>洛克王国世界精灵蛋查询</h1>
+      <p>输入蛋直径（m）和蛋重量（kg），查询可能孵化的候选精灵</p>
 
     </header>
 
@@ -335,7 +335,7 @@ onMounted(loadDataset)
 
       <section class="result-card">
         <div class="result-header">
-          <h2>候选宠物</h2>
+          <h2>候选精灵</h2>
           <el-tag v-if="hasSearched && searchMode === 'matched'" type="success" effect="light" round>
             精确命中
           </el-tag>
@@ -347,7 +347,7 @@ onMounted(loadDataset)
         <el-skeleton :loading="loadingData || searching" animated :rows="5">
           <template #default>
             <div v-if="!hasSearched" class="empty">请输入蛋直径和蛋重量后点击查询</div>
-            <div v-else-if="!candidates.length" class="empty">未查询到候选宠物</div>
+            <div v-else-if="!candidates.length" class="empty">未查询到候选精灵</div>
 
             <transition-group v-else name="rank" tag="div" class="result-list">
               <article
