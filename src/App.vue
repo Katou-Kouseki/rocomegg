@@ -13,7 +13,7 @@ const weightInput = ref('')
 const rawItems = ref([])
 const exactResults = ref([])
 const candidates = ref([])
-const searchMode = ref('matched') // exact | matched | nearest
+const searchMode = ref('matched')
 const surveyUrl = 'https://f.wps.cn/ksform/w/write/YUmapbHA/#routePromt'
 
 function toNumber(value) {
@@ -87,16 +87,6 @@ function probabilityColor(p) {
   return '#909399'
 }
 
-/**
- * 分类评分逻辑：
- * 1) 完全命中（exact）：
- *    - 仅当记录本身是“单点尺寸 + 单点重量”
- *    - 且输入值与两者完全相等
- * 2) 范围命中（matched）：
- *    - 尺寸与重量均落入区间
- * 3) 近似候选（nearest）：
- *    - 至少一维超出区间，按距离衰减评分
- */
 function evaluateRow(diameter, weight, row) {
   const dIn = inRange(diameter, row.diameterRange)
   const wIn = inRange(weight, row.weightRange)
@@ -112,11 +102,10 @@ function evaluateRow(diameter, weight, row) {
   if (exact) {
     return {
       matchType: 'exact',
-      score: 1000 // 完全命中优先级绝对最高
+      score: 1000
     }
   }
 
-  // 范围内评分：离中心越近越高
   if (dIn && wIn) {
     const dHalf = span(row.diameterRange) / 2
     const wHalf = span(row.weightRange) / 2
@@ -130,10 +119,8 @@ function evaluateRow(diameter, weight, row) {
     const dScore = gaussian(dZ)
     const wScore = gaussian(wZ)
 
-    // 尺寸权重略高
     let score = Math.pow(dScore, 0.58) * Math.pow(wScore, 0.42)
 
-    // 区间越窄，辨识度越高，给轻量加成（有上限）
     const dSpan = span(row.diameterRange)
     const wSpan = span(row.weightRange)
     const precisionBoost = 1 + 0.16 * (1 / (1 + dSpan * 12)) + 0.12 * (1 / (1 + wSpan * 2))
@@ -146,7 +133,6 @@ function evaluateRow(diameter, weight, row) {
     }
   }
 
-  // 近似评分：按超出区间距离衰减
   const dOut = distanceToRange(diameter, row.diameterRange)
   const wOut = distanceToRange(weight, row.weightRange)
 
@@ -174,7 +160,6 @@ function normalizeProbabilities(items) {
   })
 }
 
-// 按精灵聚合（用于范围命中和近似候选）
 function aggregateByPet(rows) {
   const group = new Map()
 
@@ -187,7 +172,6 @@ function aggregateByPet(rows) {
   for (const [pet, list] of group.entries()) {
     const sorted = [...list].sort((a, b) => b._score - a._score)
 
-    // 多条记录衰减叠加（支持同精灵多个单独记录）
     let petScore = 0
     for (let i = 0; i < sorted.length; i++) {
       petScore += sorted[i]._score * Math.pow(0.58, i)
@@ -294,7 +278,6 @@ async function onSearch() {
     return { ...row, matchType, _score: score }
   })
 
-  // 1) 完全命中（精确记录）优先显示，且可多条
   const exactRows = scoredRows
     .filter((r) => r.matchType === 'exact')
     .sort((a, b) => Number(a.petId) - Number(b.petId) || a.pet.localeCompare(b.pet, 'zh-CN'))
@@ -311,7 +294,6 @@ async function onSearch() {
       }))
     )
 
-    // 仍提供其他候选：先范围命中，再近似
     const rangeRows = scoredRows.filter((r) => r.matchType === 'matched')
     if (rangeRows.length > 0) {
       const merged = aggregateByPet(rangeRows).slice(0, 10)
@@ -331,7 +313,6 @@ async function onSearch() {
 
   exactResults.value = []
 
-  // 2) 范围命中
   const matchedRows = scoredRows.filter((r) => r.matchType === 'matched')
   if (matchedRows.length > 0) {
     searchMode.value = 'matched'
@@ -341,7 +322,6 @@ async function onSearch() {
     return
   }
 
-  // 3) 近似候选
   searchMode.value = 'nearest'
   const nearestRows = scoredRows.sort((a, b) => b._score - a._score).slice(0, 24)
   const merged = aggregateByPet(nearestRows).slice(0, 8)
@@ -439,7 +419,6 @@ onMounted(loadDataset)
             <div v-if="!hasSearched" class="empty">请输入蛋尺寸和蛋重量后点击查询</div>
             <div v-else-if="!exactResults.length && !candidates.length" class="empty">未查询到候选精灵</div>
 
-            <!-- 完全命中（精确记录）单独展示，可多条 -->
             <div v-if="exactResults.length" class="exact-block">
               <div class="sub-head">完全命中（精确记录）</div>
               <transition-group name="rank" tag="div" class="result-list">
@@ -460,7 +439,6 @@ onMounted(loadDataset)
               </transition-group>
             </div>
 
-            <!-- 其他候选 -->
             <div v-if="candidates.length" class="other-block">
               <div class="sub-head">{{ exactResults.length ? '其他候选' : '结果列表' }}</div>
               <transition-group name="rank" tag="div" class="result-list">
@@ -510,7 +488,7 @@ onMounted(loadDataset)
   max-width: 980px;
   margin: 0 auto 14px;
   padding: 10px 12px;
-  border-radius: 14px;
+  border-radius: 22px;
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(201, 196, 213, 0.5);
   box-shadow: 0 10px 24px rgba(81, 64, 179, 0.08);
@@ -535,13 +513,19 @@ onMounted(loadDataset)
 
 .hero {
   max-width: 980px;
-  margin: 0 auto 18px;
+  margin: 0 auto 16px;
   text-align: center;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 22px;
+  padding: 18px 20px;
+  box-shadow: 0 18px 36px rgba(81, 64, 179, 0.08);
+  border: 1px solid rgba(201, 196, 213, 0.45);
+  backdrop-filter: blur(8px);
 }
 .hero h1 {
   margin: 0;
   color: #5140b3;
-  font-size: clamp(28px, 4.4vw, 46px);
+  font-size: clamp(26px, 4.1vw, 42px);
 }
 
 .panel {
@@ -586,7 +570,6 @@ onMounted(loadDataset)
   width: 100%;
 }
 
-/* 修复 Element Plus 相邻按钮默认 margin-left 导致的移动端偏移 */
 .actions :deep(.el-button + .el-button) {
   margin-left: 0 !important;
 }
@@ -694,7 +677,6 @@ onMounted(loadDataset)
   color: #5140b3;
 }
 
-/* 排序动画 */
 .rank-enter-active,
 .rank-leave-active {
   transition: all 0.35s ease;
