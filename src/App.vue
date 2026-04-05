@@ -463,6 +463,17 @@ onMounted(loadDataset)
         </el-skeleton>
       </section>
     </main>
+
+    <footer class="site-footer">
+      <span>© 2026 洛克王国世界精灵蛋查询站</span>
+      <a
+        href="https://github.com/mfskys/rocomegg"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        GitHub 项目主页
+      </a>
+    </footer>
   </div>
 </template>
 
@@ -643,6 +654,27 @@ onMounted(loadDataset)
 }
 :deep(.el-input__wrapper.is-focus) {
   box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.65) inset !important;
+}
+
+.site-footer {
+  max-width: 980px;
+  margin: 18px auto 0;
+  padding: 12px 6px 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  color: #6f6a86;
+  font-size: 13px;
+}
+
+.site-footer a {
+  color: #5140b3;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.site-footer a:hover {
+  text-decoration: underline;
 }
 
 @media (min-width: 860px) {
