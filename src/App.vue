@@ -90,10 +90,10 @@ function probabilityColor(p) {
 /**
  * 分类评分逻辑：
  * 1) 完全命中（exact）：
- *    - 仅当记录本身是“单点直径 + 单点重量”
+ *    - 仅当记录本身是“单点尺寸 + 单点重量”
  *    - 且输入值与两者完全相等
  * 2) 范围命中（matched）：
- *    - 直径与重量均落入区间
+ *    - 尺寸与重量均落入区间
  * 3) 近似候选（nearest）：
  *    - 至少一维超出区间，按距离衰减评分
  */
@@ -130,7 +130,7 @@ function evaluateRow(diameter, weight, row) {
     const dScore = gaussian(dZ)
     const wScore = gaussian(wZ)
 
-    // 直径权重略高
+    // 尺寸权重略高
     let score = Math.pow(dScore, 0.58) * Math.pow(wScore, 0.42)
 
     // 区间越窄，辨识度越高，给轻量加成（有上限）
@@ -273,11 +273,11 @@ async function onSearch() {
   const w = toNumber(weightInput.value)
 
   if (!Number.isFinite(d) || !Number.isFinite(w)) {
-    ElMessage.warning('请输入有效数字（蛋直径 / 蛋重量）')
+    ElMessage.warning('请输入有效数字（蛋尺寸 / 蛋重量）')
     return
   }
   if (d <= 0 || w <= 0) {
-    ElMessage.warning('蛋直径和蛋重量必须大于 0')
+    ElMessage.warning('蛋尺寸和蛋重量必须大于 0')
     return
   }
   if (!rawItems.value.length) {
@@ -356,7 +356,7 @@ onMounted(loadDataset)
   <div class="page">
     <header class="hero">
       <h1>洛克王国世界精灵蛋查询站</h1>
-      <p>输入蛋直径（m）和蛋重量（kg），查询可能孵化的候选精灵</p>
+      <p>输入蛋尺寸（m）和蛋重量（kg），查询可能孵化的候选精灵</p>
     </header>
 
     <main class="panel">
@@ -364,7 +364,7 @@ onMounted(loadDataset)
         <h2>查询条件</h2>
         <el-form label-position="top" class="search-form">
           <div class="grid">
-            <el-form-item label="蛋直径（m）">
+            <el-form-item label="蛋尺寸（m）">
               <el-input
                 v-model="diameterInput"
                 type="number"
@@ -420,7 +420,7 @@ onMounted(loadDataset)
 
         <el-skeleton :loading="loadingData || searching" animated :rows="5">
           <template #default>
-            <div v-if="!hasSearched" class="empty">请输入蛋直径和蛋重量后点击查询</div>
+            <div v-if="!hasSearched" class="empty">请输入蛋尺寸和蛋重量后点击查询</div>
             <div v-else-if="!exactResults.length && !candidates.length" class="empty">未查询到候选精灵</div>
 
             <!-- 完全命中（精确记录）单独展示，可多条 -->
@@ -433,7 +433,7 @@ onMounted(loadDataset)
                       <h3>{{ index + 1 }}. {{ item.pet }}</h3>
                       <span class="pet-id">#{{ item.petId }}</span>
                     </div>
-                    <p>精确直径：{{ item.eggDiameter }} m</p>
+                    <p>精确尺寸：{{ item.eggDiameter }} m</p>
                     <p>精确重量：{{ item.eggWeight }} kg</p>
                   </div>
                   <div class="right">
@@ -454,7 +454,7 @@ onMounted(loadDataset)
                       <h3>{{ index + 1 }}. {{ item.pet }}</h3>
                       <span class="pet-id">#{{ item.petId }}</span>
                     </div>
-                    <p>蛋直径范围：{{ item.eggDiameter }} m</p>
+                    <p>蛋尺寸范围：{{ item.eggDiameter }} m</p>
                     <p>蛋重量范围：{{ item.eggWeight }} kg</p>
                     <p v-if="item.matchCount > 1" class="meta">命中记录：{{ item.matchCount }} 条</p>
                   </div>
@@ -542,12 +542,16 @@ onMounted(loadDataset)
 }
 
 .actions :deep(.el-button) {
-  flex: 1 1 calc(50% - 5px);
   min-width: 120px;
 }
 
+.submit-btn,
+.reset-btn {
+  flex: 1 1 calc(50% - 5px);
+}
+
 .query-btn {
-  width: 100%;
+  flex: 1 1 100%;
   border-radius: 999px !important;
   border: none !important;
   padding: 12px 28px !important;
@@ -556,7 +560,6 @@ onMounted(loadDataset)
 }
 
 .reset-btn {
-  width: 100%;
   border-radius: 999px !important;
   border: none !important;
   padding: 12px 26px !important;
@@ -565,7 +568,6 @@ onMounted(loadDataset)
 }
 
 .submit-btn {
-  width: 100%;
   border-radius: 999px !important;
   border: 1px solid #d8d3f2 !important;
   padding: 12px 26px !important;
