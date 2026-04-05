@@ -354,9 +354,25 @@ onMounted(loadDataset)
 
 <template>
   <div class="page">
+    <nav class="top-nav">
+      <div class="nav-left">
+        <span class="brand">洛克王国工具站</span>
+      </div>
+      <div class="nav-right">
+        <el-dropdown trigger="click">
+          <el-button class="more-btn" plain>更多</el-button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item>精灵蛋尺寸查询（当前）</el-dropdown-item>
+              <el-dropdown-item disabled>精灵蛋蛋组查询（即将上线）</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
+    </nav>
+
     <header class="hero">
-      <h1>洛克王国世界精灵蛋查询站</h1>
-      <p>输入蛋尺寸（m）和蛋重量（kg），查询可能孵化的候选精灵</p>
+      <h1>洛克王国世界精灵蛋查询</h1>
     </header>
 
     <main class="panel">
@@ -471,7 +487,7 @@ onMounted(loadDataset)
     </main>
 
     <footer class="site-footer">
-      <span>© 2026 洛克王国世界精灵蛋查询站</span>
+      <span>© 2026 洛克王国世界精灵蛋查询</span>
       <a
         href="https://github.com/mfskys/rocomegg"
         target="_blank"
@@ -486,8 +502,35 @@ onMounted(loadDataset)
 <style scoped>
 .page {
   min-height: 100vh;
-  padding: 28px 14px 46px;
+  padding: 16px 14px 46px;
   background: radial-gradient(circle at top left, #faf8ff, #eeedf5 58%, #e8e7ef);
+}
+
+.top-nav {
+  max-width: 980px;
+  margin: 0 auto 14px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(201, 196, 213, 0.5);
+  box-shadow: 0 10px 24px rgba(81, 64, 179, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.nav-left .brand {
+  font-weight: 800;
+  color: #5140b3;
+  letter-spacing: 0.3px;
+}
+
+.more-btn {
+  border-radius: 999px !important;
+  border: 1px solid #d8d3f2 !important;
+  color: #5140b3 !important;
+  font-weight: 600;
 }
 
 .hero {
@@ -499,10 +542,6 @@ onMounted(loadDataset)
   margin: 0;
   color: #5140b3;
   font-size: clamp(28px, 4.4vw, 46px);
-}
-.hero p {
-  margin: 10px 0 8px;
-  color: #474553;
 }
 
 .panel {
@@ -537,21 +576,22 @@ onMounted(loadDataset)
 .actions {
   display: flex;
   gap: 10px;
-  flex-wrap: wrap;
+  flex-direction: column;
   width: 100%;
 }
 
 .actions :deep(.el-button) {
   min-width: 120px;
+  flex: 1 1 100%;
+  width: 100%;
 }
 
-.submit-btn,
-.reset-btn {
-  flex: 1 1 calc(50% - 5px);
+/* 修复 Element Plus 相邻按钮默认 margin-left 导致的移动端偏移 */
+.actions :deep(.el-button + .el-button) {
+  margin-left: 0 !important;
 }
 
 .query-btn {
-  flex: 1 1 100%;
   border-radius: 999px !important;
   border: none !important;
   padding: 12px 28px !important;
@@ -703,11 +743,16 @@ onMounted(loadDataset)
 }
 
 @media (min-width: 860px) {
+  .top-nav {
+    padding: 12px 16px;
+  }
+
   .grid {
     grid-template-columns: 1fr 1fr;
   }
 
   .actions {
+    flex-direction: row;
     flex-wrap: nowrap;
     justify-content: flex-end;
     gap: 12px;
