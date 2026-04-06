@@ -1,5 +1,5 @@
 {
-  "total": 318,
+  "total": 321,
   "items": [
     {
       "id": 1,
@@ -501,7 +501,7 @@
     },
     {
       "id": 87,
-      "eggDiameter": "0.31-0.36",
+      "eggDiameter": "0.31-0.37",
       "eggWeight": "1.785-2.32",
       "pet": "菊花梨"
     },
@@ -1348,7 +1348,7 @@
     {
       "id": 235,
       "eggDiameter": "0.13-0.16",
-      "eggWeight": "1.419-1.894",
+      "eggWeight": "1.395-1.894",
       "pet": "号儿鱼"
     },
     {
@@ -1908,6 +1908,24 @@
       "eggDiameter": "0.16",
       "eggWeight": "4.155",
       "pet": "棋棋"
+    },
+    {
+      "id": 330,
+      "eggDiameter": "0.13",
+      "eggWeight": "1.395",
+      "pet": "号儿鱼"
+    },
+    {
+      "id": 331,
+      "eggDiameter": "0.2",
+      "eggWeight": "1.848",
+      "pet": "锤头鹮"
+    },
+    {
+      "id": 332,
+      "eggDiameter": "0.37",
+      "eggWeight": "2.308",
+      "pet": "菊花梨"
     }
   ]
 }
