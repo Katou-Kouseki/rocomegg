@@ -1,5 +1,5 @@
 {
-  "total": 311,
+  "total": 317,
   "items": [
     {
       "id": 1,
@@ -327,8 +327,8 @@
     },
     {
       "id": 57,
-      "eggDiameter": "0.44~0.75",
-      "eggWeight": "2.857~9",
+      "eggDiameter": "0.43~0.75",
+      "eggWeight": "2.772~9",
       "pet": "古钟蛇"
     },
     {
@@ -1467,8 +1467,8 @@
     },
     {
       "id": 255,
-      "eggDiameter": "0.18-0.184",
-      "eggWeight": "2.479-2.724",
+      "eggDiameter": "0.16-0.184",
+      "eggWeight": "1.968-2.724",
       "pet": "小箱怪"
     },
     {
@@ -1491,7 +1491,7 @@
     },
     {
       "id": 259,
-      "eggDiameter": "0.19-0.22",
+      "eggDiameter": "0.19-0.23",
       "eggWeight": "5.165-7.44",
       "pet": "柴渣虫"
     },
@@ -1641,7 +1641,7 @@
     },
     {
       "id": 284,
-      "eggDiameter": "0.344-0.492",
+      "eggDiameter": "0.344-0.51",
       "eggWeight": "3.8-5",
       "pet": "雪豆丁"
     },
@@ -1866,6 +1866,42 @@
       "eggDiameter": "0.22",
       "eggWeight": "2.554",
       "pet": "小甲虫"
+    },
+    {
+      "id": 323,
+      "eggDiameter": "0.18",
+      "eggWeight": "3.326",
+      "pet": "大耳帽兜"
+    },
+    {
+      "id": 324,
+      "eggDiameter": "0.28",
+      "eggWeight": "4.774",
+      "pet": "治愈兔"
+    },
+    {
+      "id": 325,
+      "eggDiameter": "0.43",
+      "eggWeight": "2.772",
+      "pet": "古钟蛇"
+    },
+    {
+      "id": 326,
+      "eggDiameter": "0.23",
+      "eggWeight": "7.113",
+      "pet": "柴渣虫"
+    },
+    {
+      "id": 327,
+      "eggDiameter": "0.51",
+      "eggWeight": "4.985",
+      "pet": "雪豆丁"
+    },
+    {
+      "id": 328,
+      "eggDiameter": "0.16",
+      "eggWeight": "1.968",
+      "pet": "小箱怪"
     }
   ]
 }
