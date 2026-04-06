@@ -1,5 +1,5 @@
 {
-  "total": 317,
+  "total": 318,
   "items": [
     {
       "id": 1,
@@ -1768,7 +1768,7 @@
     {
       "id": 305,
       "eggDiameter": "0.16~0.2",
-      "eggWeight": "4.276~5.497",
+      "eggWeight": "4.155~5.497",
       "pet": "棋棋"
     },
     {
@@ -1902,6 +1902,12 @@
       "eggDiameter": "0.16",
       "eggWeight": "1.968",
       "pet": "小箱怪"
+    },
+    {
+      "id": 329,
+      "eggDiameter": "0.16",
+      "eggWeight": "4.155",
+      "pet": "棋棋"
     }
   ]
 }
