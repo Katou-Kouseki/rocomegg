@@ -723,6 +723,9 @@ function buildShinyCollectionPlan({ seedFinals, candidates, groupsByPet, stageTo
     return false
   }
 
+  const hasOwnedMale = (pet) => ownedGenderMap?.get(pet)?.has('male') === true
+  const hasOwnedFemale = (pet) => ownedGenderMap?.get(pet)?.has('female') === true
+
   const cards = []
   for (const seed of normalizedSeeds) {
     cards.push({
@@ -732,6 +735,22 @@ function buildShinyCollectionPlan({ seedFinals, candidates, groupsByPet, stageTo
       desc: '该异色已在你的已有清单中。',
       status: 'done'
     })
+
+    if (!hasOwnedMale(seed) && hasOwnedFemale(seed) && !shinyFemaleOnlyPets.has(seed) && needAsMaleDonor(seed, pendingTargets)) {
+      cards.push({
+        title: `收集：${seed}（雄性）`,
+        target: seed,
+        groupText: groupTextOf(seed),
+        desc: '',
+        pair: {
+          female: seed,
+          malePrefix: '同蛋组雄性',
+          maleName: ''
+        },
+        status: 'can'
+      })
+      malePool.add(seed)
+    }
   }
 
   for (const pet of targets) {
@@ -768,7 +787,8 @@ function buildShinyCollectionPlan({ seedFinals, candidates, groupsByPet, stageTo
         desc: '',
         pair: {
           female: pet,
-          male: donorMale
+          malePrefix: '已有异色雄性',
+          maleName: donorMale
         },
         status: 'can'
       })
@@ -1253,7 +1273,7 @@ onBeforeUnmount(() => {
                     <el-radio-button label="female">雌性</el-radio-button>
                     <el-radio-button label="male">雄性</el-radio-button>
                   </el-radio-group>
-                  <el-button class="query-btn owned-add-btn" type="primary" size="large" @click="addShinyOwned">+ 添加</el-button>
+                  <el-button class="query-btn owned-add-btn" type="primary" size="large" @click="addShinyOwned">+</el-button>
                 </div>
                 <div v-if="shinyOwnedList.length" class="group-tags">
                   <el-tag
@@ -1393,10 +1413,10 @@ onBeforeUnmount(() => {
                       >
                         <div class="title-row">
                           <h3 class="group-pet-name">{{ card.title }}</h3>
-                          <span class="pet-id">{{ card.groupText || '无蛋组' }}</span>
+                          <span class="pet-id route-group-tag">{{ card.groupText || '无蛋组' }}</span>
                         </div>
                         <p v-if="card.status === 'can' && card.pair" class="chain-text">
-                          普通雌性 <span class="sex-female">{{ card.pair.female }}</span> × 已有异色雄性 <span class="sex-male">{{ card.pair.male }}</span>。
+                          普通雌性 <span class="sex-female">{{ card.pair.female }}</span> × {{ card.pair.malePrefix }} <span v-if="card.pair.maleName" class="sex-male">{{ card.pair.maleName }}</span>。
                         </p>
                         <p v-else class="chain-text">{{ card.desc }}</p>
                       </article>
@@ -1841,7 +1861,14 @@ onBeforeUnmount(() => {
 }
 
 .owned-add-btn {
-  width: 108px !important;
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  border-radius: 999px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
   justify-self: end;
 }
 
@@ -1995,6 +2022,12 @@ onBeforeUnmount(() => {
 .page.theme-dark.shiny-active :deep(.el-input__wrapper) {
   background: #082f49;
   box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4) inset !important;
+}
+
+@media (max-width: 859px) {
+  .route-card .route-group-tag {
+    display: none;
+  }
 }
 
 @media (min-width: 860px) {

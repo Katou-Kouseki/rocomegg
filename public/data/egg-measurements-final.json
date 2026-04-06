@@ -1,5 +1,5 @@
 {
-  "total": 299,
+  "total": 311,
   "items": [
     {
       "id": 1,
@@ -1059,7 +1059,7 @@
     },
     {
       "id": 186,
-      "eggDiameter": "0.55~0.85",
+      "eggDiameter": "0.54~0.85",
       "eggWeight": "7~37",
       "pet": "月牙雪熊"
     },
@@ -1071,8 +1071,8 @@
     },
     {
       "id": 188,
-      "eggDiameter": "0.26-0.33",
-      "eggWeight": "5.057-6.345",
+      "eggDiameter": "0.25-0.33",
+      "eggWeight": "5.002-6.345",
       "pet": "锥尾羊"
     },
     {
@@ -1659,8 +1659,8 @@
     },
     {
       "id": 287,
-      "eggDiameter": "0.46-0.56",
-      "eggWeight": "10.417-14.148",
+      "eggDiameter": "0.42-0.56",
+      "eggWeight": "8.692-14.148",
       "pet": "火红尾"
     },
     {
@@ -1794,6 +1794,78 @@
       "eggDiameter": "0.14",
       "eggWeight": "0.735",
       "pet": "小鹬"
+    },
+    {
+      "id": 311,
+      "eggDiameter": "0.54",
+      "eggWeight": "28.472",
+      "pet": "月牙雪熊"
+    },
+    {
+      "id": 312,
+      "eggDiameter": "0.25",
+      "eggWeight": "2.572",
+      "pet": "电咩咩"
+    },
+    {
+      "id": 313,
+      "eggDiameter": "0.25",
+      "eggWeight": "2.779",
+      "pet": "小灵菇"
+    },
+    {
+      "id": 314,
+      "eggDiameter": "0.42",
+      "eggWeight": "8.692",
+      "pet": "火红尾"
+    },
+    {
+      "id": 315,
+      "eggDiameter": "0.21",
+      "eggWeight": "28.646",
+      "pet": "石石"
+    },
+    {
+      "id": 316,
+      "eggDiameter": "0.25",
+      "eggWeight": "5.002",
+      "pet": "锥尾羊"
+    },
+    {
+      "id": 317,
+      "eggDiameter": "0.22",
+      "eggWeight": "2.442",
+      "pet": "小灵菇"
+    },
+    {
+      "id": 318,
+      "eggDiameter": "0.68",
+      "eggWeight": "33.753",
+      "pet": "恶魔狼"
+    },
+    {
+      "id": 319,
+      "eggDiameter": "0.18",
+      "eggWeight": "1.722",
+      "pet": "一窝蜂"
+    },
+    {
+      "id": 320,
+      "eggDiameter": "0.22",
+      "eggWeight": "1.576",
+      "pet": "恶魔叮"
+    },
+    {
+      "id": 321,
+      "eggDiameter": "0.26",
+      "eggWeight": "17.336",
+      "pet": "嘟嘟煲"
+    },
+    {
+      "id": 322,
+      "eggDiameter": "0.22",
+      "eggWeight": "2.554",
+      "pet": "小甲虫"
     }
   ]
 }
