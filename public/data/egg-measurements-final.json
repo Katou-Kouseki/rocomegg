@@ -1,5 +1,5 @@
 {
-  "total": 366,
+  "total": 371,
   "items": [
     {
       "id": 1,
@@ -1396,7 +1396,7 @@
     {
       "id": 244,
       "eggDiameter": "0.16-0.228",
-      "eggWeight": "1.4-2.16",
+      "eggWeight": "1.3-2.16",
       "pet": "格兰种子"
     },
     {
@@ -1450,7 +1450,7 @@
     {
       "id": 253,
       "eggDiameter": "0.16-0.23",
-      "eggWeight": "1.444-2.204",
+      "eggWeight": "1.435-2.204",
       "pet": "奇丽草"
     },
     {
@@ -2196,6 +2196,36 @@
       "eggDiameter": "0.29",
       "eggWeight": "14.324",
       "pet": "翡翠水母"
+    },
+    {
+      "id": 378,
+      "eggDiameter": "0.17",
+      "eggWeight": "1.3",
+      "pet": "格兰种子"
+    },
+    {
+      "id": 379,
+      "eggDiameter": "0.16",
+      "eggWeight": "1.435",
+      "pet": "奇丽草"
+    },
+    {
+      "id": 380,
+      "eggDiameter": "0.31",
+      "eggWeight": "1.118",
+      "pet": "粉粉星"
+    },
+    {
+      "id": 381,
+      "eggDiameter": "0.14",
+      "eggWeight": "0.5",
+      "pet": "画精灵"
+    },
+    {
+      "id": 382,
+      "eggDiameter": "0.31-0.32",
+      "eggWeight": "1.118-1.15",
+      "pet": "粉粉星"
     }
   ]
 }
