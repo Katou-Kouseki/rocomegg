@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Search, Refresh, Sunny, Moon, Monitor } from '@element-plus/icons-vue'
 import html2canvas from 'html2canvas'
@@ -27,6 +27,7 @@ const candidates = ref([])
 const searchMode = ref('matched')
 const surveyUrl = 'https://f.wps.cn/ksform/w/write/YUmapbHA/#routePromt'
 const sharingPoster = ref(false)
+const sharingCapture = ref(false)
 const shareImageUrl = ref('')
 
 const groupKeyword = ref('')
@@ -591,8 +592,12 @@ async function onShareLongImage() {
   if (typeof window === 'undefined' || typeof document === 'undefined') return
 
   sharingPoster.value = true
+  sharingCapture.value = true
   try {
+    await nextTick()
+
     const target =
+      document.querySelector('.share-poster-target') ||
       document.querySelector('.panel') ||
       document.querySelector('.page')
 
@@ -601,7 +606,8 @@ async function onShareLongImage() {
       return
     }
 
-    const posterIsDark = activeTheme.value === 'dark'
+    const htmlTheme = document.documentElement.getAttribute('data-theme')
+    const posterIsDark = activeTheme.value === 'dark' || htmlTheme === 'dark'
     const posterBg = posterIsDark ? '#0b1220' : '#ffffff'
     const footerTitleColor = posterIsDark ? '#e5e7eb' : '#111827'
     const footerTextColor = posterIsDark ? '#cbd5e1' : '#4b5563'
@@ -671,6 +677,7 @@ async function onShareLongImage() {
     console.error(err)
     ElMessage.warning('分享长图生成失败，请稍后重试')
   } finally {
+    sharingCapture.value = false
     sharingPoster.value = false
   }
 }
@@ -1383,7 +1390,7 @@ onBeforeUnmount(() => {
 
     <template v-if="currentMode === 'size'">
       <main class="panel">
-        <section class="search-card">
+        <section v-if="!sharingCapture" class="search-card">
           <h3>数据个数：<span style="color: var(--app-primary); font-weight: 800;">{{ datasetCount }}</span></h3>
           <p class="chain-text">可进行查询精灵蛋数据，同时可进行投稿</p>
         </section>
@@ -1400,7 +1407,7 @@ onBeforeUnmount(() => {
               </el-form-item>
             </div>
 
-            <div class="actions">
+            <div v-if="!sharingCapture" class="actions">
               <el-button class="submit-btn" size="large" @click="onOpenSurvey">投稿数据</el-button>
               <el-button class="reset-btn" size="large" :icon="Refresh" @click="onReset">重置</el-button>
               <el-button
@@ -1427,8 +1434,14 @@ onBeforeUnmount(() => {
           </el-form>
         </section>
 
-        <section class="result-card">
-          <div class="result-header">
+        <section class="result-card share-poster-target">
+          <div v-if="sharingCapture" class="share-query-wrap">
+            <div class="sub-head">查询条件</div>
+            <div class="share-query-meta">
+              <p class="share-query-item-line">蛋尺寸：{{ String(diameterInput || '').trim() || '--' }} ｜ 蛋重量：{{ String(weightInput || '').trim() || '--' }}</p>
+            </div>
+          </div>
+          <div v-if="!sharingCapture" class="result-header">
             <h2>候选精灵</h2>
             <el-tag v-if="hasSearched && searchMode === 'precise'" type="danger" effect="light" round>精准命中</el-tag>
             <el-tag v-else-if="hasSearched && searchMode === 'tolerance1'" type="warning" effect="light" round>容差命中（尺寸 ±0.01，重量 ±0.1）</el-tag>
@@ -2035,6 +2048,24 @@ onBeforeUnmount(() => {
   gap: 10px;
 }
 
+.share-query-wrap {
+  margin-bottom: 10px;
+}
+
+.share-query-meta {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--app-item-bg);
+  border: 1px dashed var(--app-tag-border);
+}
+
+.share-query-item-line {
+  margin: 0;
+  font-size: 14px;
+  color: var(--app-text-soft);
+  font-weight: 700;
+}
+
 .empty {
   text-align: center;
   color: #6a6880;
@@ -2296,11 +2327,26 @@ onBeforeUnmount(() => {
 :deep(.el-input__wrapper) {
   border-radius: 14px;
   background: #e8e7ef;
-  box-shadow: none;
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.12) inset !important;
+  min-height: 42px;
+  align-items: center;
+}
+
+:deep(.el-input__wrapper:hover) {
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.16) inset !important;
 }
 
 :deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.35) inset !important;
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2) inset !important;
+}
+
+:deep(.el-input__inner) {
+  height: 42px;
+  line-height: 42px;
+}
+
+:deep(.el-input__inner:focus) {
+  outline: none !important;
 }
 
 .site-footer {
@@ -2353,6 +2399,11 @@ onBeforeUnmount(() => {
   box-shadow: 0 12px 28px rgba(2, 6, 23, 0.55);
 }
 
+.page.theme-dark .exact-item {
+  background: linear-gradient(180deg, #1a2130, #121827);
+  border-color: rgba(248, 113, 113, 0.55);
+}
+
 .page.theme-dark .group-summary {
   background: linear-gradient(180deg, #111827, #0b1220);
   border-color: rgba(96, 165, 250, 0.35);
@@ -2372,15 +2423,15 @@ onBeforeUnmount(() => {
 .page.theme-dark :deep(.el-input__wrapper) {
   background: #020617;
   color: #e5e7eb;
-  box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.45) inset !important;
+  box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.2) inset !important;
 }
 
 .page.theme-dark :deep(.el-input__wrapper:hover) {
-  box-shadow: 0 0 0 1px rgba(147, 197, 253, 0.65) inset !important;
+  box-shadow: 0 0 0 1px rgba(147, 197, 253, 0.28) inset !important;
 }
 
 .page.theme-dark :deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.75) inset !important;
+  box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.32) inset !important;
 }
 
 .page.theme-dark :deep(.el-input__inner) {
