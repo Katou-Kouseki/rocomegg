@@ -1,5 +1,5 @@
 {
-  "total": 393,
+  "total": 405,
   "items": [
     {
       "id": 1,
@@ -220,7 +220,7 @@
     {
       "id": 38,
       "eggDiameter": "0.13-0.18",
-      "eggWeight": "0.437-0.587",
+      "eggWeight": "0.437-0.598",
       "pet": "豆丁鱼"
     },
     {
@@ -364,7 +364,7 @@
     {
       "id": 63,
       "eggDiameter": "0.32-0.34",
-      "eggWeight": "1.881-2.373",
+      "eggWeight": "1.544-2.373",
       "pet": "海枝枝"
     },
     {
@@ -466,7 +466,7 @@
     {
       "id": 81,
       "eggDiameter": "0.44-0.85",
-      "eggWeight": "33.61-44.38",
+      "eggWeight": "33.61-44.532",
       "pet": "记忆石"
     },
     {
@@ -783,8 +783,8 @@
     },
     {
       "id": 139,
-      "eggDiameter": "0.23-0.29",
-      "eggWeight": "8.792-13.6",
+      "eggDiameter": "0.21-0.29",
+      "eggWeight": "7.455-13.6",
       "pet": "石肤蜥"
     },
     {
@@ -1569,8 +1569,8 @@
     },
     {
       "id": 273,
-      "eggDiameter": "0.24-0.31",
-      "eggWeight": "4.221-5.342",
+      "eggDiameter": "0.24-0.34",
+      "eggWeight": "4.221-5.65",
       "pet": "治愈兔"
     },
     {
@@ -2358,6 +2358,78 @@
       "eggDiameter": "0.27",
       "eggWeight": "3.343",
       "pet": "小帕尔"
+    },
+    {
+      "id": 405,
+      "eggDiameter": "0.36",
+      "eggWeight": "14.123",
+      "pet": "幽影树"
+    },
+    {
+      "id": 406,
+      "eggDiameter": "0.34",
+      "eggWeight": "5.65",
+      "pet": "治愈兔"
+    },
+    {
+      "id": 407,
+      "eggDiameter": "0.18",
+      "eggWeight": "0.598",
+      "pet": "豆丁鱼"
+    },
+    {
+      "id": 408,
+      "eggDiameter": "0.27",
+      "eggWeight": "10.654",
+      "pet": "幽影树"
+    },
+    {
+      "id": 409,
+      "eggDiameter": "0.22",
+      "eggWeight": "6.181",
+      "pet": "风铃鲨"
+    },
+    {
+      "id": 410,
+      "eggDiameter": "0.28",
+      "eggWeight": "1.467",
+      "pet": "胆小鳗鱼"
+    },
+    {
+      "id": 411,
+      "eggDiameter": "0.58",
+      "eggWeight": "34.206",
+      "pet": "月牙雪熊"
+    },
+    {
+      "id": 412,
+      "eggDiameter": "0.58",
+      "eggWeight": "34.25",
+      "pet": "月牙雪熊"
+    },
+    {
+      "id": 413,
+      "eggDiameter": "0.16",
+      "eggWeight": "0.516",
+      "pet": "豆丁鱼"
+    },
+    {
+      "id": 414,
+      "eggDiameter": "0.21",
+      "eggWeight": "7.455",
+      "pet": "石肤蜥"
+    },
+    {
+      "id": 415,
+      "eggDiameter": "0.32",
+      "eggWeight": "1.544",
+      "pet": "海枝枝"
+    },
+    {
+      "id": 416,
+      "eggDiameter": "0.58",
+      "eggWeight": "44.532",
+      "pet": "记忆石"
     }
   ]
 }
