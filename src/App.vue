@@ -257,6 +257,20 @@ function probabilityColor(p) {
   return '#909399'
 }
 
+function normalizePetId(petId) {
+  const raw = String(petId ?? '').trim()
+  if (!raw || raw === '--') return ''
+  const num = Number(raw)
+  if (!Number.isFinite(num) || num <= 0) return ''
+  return String(Math.trunc(num)).padStart(3, '0')
+}
+
+function getCreatureImageUrl(petId) {
+  const id = normalizePetId(petId)
+  if (!id) return ''
+  return `${import.meta.env.BASE_URL || '/'}creature-id-images/${id}.png`
+}
+
 function evaluateRow(diameter, weight, row) {
   const dIn = inRange(diameter, row.diameterRange)
   const wIn = inRange(weight, row.weightRange)
@@ -1333,12 +1347,19 @@ onBeforeUnmount(() => {
                 <transition-group name="rank" tag="div" class="result-list">
                   <article v-for="(item, index) in exactResults" :key="`exact-${item.petId}-${index}`" class="result-item exact-item">
                     <div class="left">
-                      <div class="title-row">
-                        <h3>{{ index + 1 }}. {{ item.pet }}</h3>
-                        <span class="pet-id">#{{ item.petId }}</span>
+                      <div class="pet-row">
+                        <div class="pet-avatar" v-if="getCreatureImageUrl(item.petId)">
+                          <img :src="getCreatureImageUrl(item.petId)" :alt="item.pet" loading="lazy" />
+                        </div>
+                        <div class="pet-meta">
+                          <div class="title-row">
+                            <h3>{{ index + 1 }}. {{ item.pet }}</h3>
+                            <span class="pet-id">#{{ item.petId }}</span>
+                          </div>
+                          <p>精确尺寸：{{ item.eggDiameter }} m</p>
+                          <p>精确重量：{{ item.eggWeight }} kg</p>
+                        </div>
                       </div>
-                      <p>精确尺寸：{{ item.eggDiameter }} m</p>
-                      <p>精确重量：{{ item.eggWeight }} kg</p>
                     </div>
                     <div class="right">
                       <div class="prob">{{ item.probability }}%</div>
@@ -1353,13 +1374,20 @@ onBeforeUnmount(() => {
                 <transition-group name="rank" tag="div" class="result-list">
                   <article v-for="(item, index) in candidates" :key="`${item.petId}-${item.pet}`" class="result-item">
                     <div class="left">
-                      <div class="title-row">
-                        <h3>{{ index + 1 }}. {{ item.pet }}</h3>
-                        <span class="pet-id">#{{ item.petId }}</span>
+                      <div class="pet-row">
+                        <div class="pet-avatar" v-if="getCreatureImageUrl(item.petId)">
+                          <img :src="getCreatureImageUrl(item.petId)" :alt="item.pet" loading="lazy" />
+                        </div>
+                        <div class="pet-meta">
+                          <div class="title-row">
+                            <h3>{{ index + 1 }}. {{ item.pet }}</h3>
+                            <span class="pet-id">#{{ item.petId }}</span>
+                          </div>
+                          <p>蛋尺寸范围：{{ item.eggDiameter }} m</p>
+                          <p>蛋重量范围：{{ item.eggWeight }} kg</p>
+                          <p v-if="item.matchCount > 1" class="meta">命中记录：{{ item.matchCount }} 条</p>
+                        </div>
                       </div>
-                      <p>蛋尺寸范围：{{ item.eggDiameter }} m</p>
-                      <p>蛋重量范围：{{ item.eggWeight }} kg</p>
-                      <p v-if="item.matchCount > 1" class="meta">命中记录：{{ item.matchCount }} 条</p>
                     </div>
                     <div class="right">
                       <div class="prob">{{ item.probability }}%</div>
@@ -1930,6 +1958,35 @@ onBeforeUnmount(() => {
 
 .group-pet-name {
   margin: 0 !important;
+}
+
+.pet-row {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.pet-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 188, 225, 0.38);
+  background: #fff;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pet-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.pet-meta {
+  min-width: 0;
 }
 
 .group-tags {
