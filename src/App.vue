@@ -70,6 +70,9 @@ const groupIndex = ref({
 })
 
 const eggGroupInput = EGG_GROUP_INPUT
+const groupStageOptions = computed(() =>
+  Object.keys(eggGroupInput).sort((a, b) => a.localeCompare(b, 'zh-CN'))
+)
 
 const THEME_STORAGE_KEY = 'rocom_theme_mode'
 const themeMode = ref('auto')
@@ -1422,11 +1425,26 @@ onBeforeUnmount(() => {
 
           <el-form v-if="groupSubMode === 'group'" label-position="top" class="search-form" @submit.prevent>
             <div class="grid">
-              <el-form-item label="精灵名称关键词">
-                <el-input v-model="groupKeyword" placeholder="例如：恶魔狼、夜枭" clearable size="large" />
+              <el-form-item label="精灵名称">
+                <el-input
+                  v-model="groupKeyword"
+                  placeholder="请输入精灵名称"
+                  clearable
+                  size="large"
+                  :disabled="!!groupStage"
+                />
               </el-form-item>
-              <el-form-item label="蛋组关键词">
-                <el-input v-model="groupStage" placeholder="例如：动物组、昆虫组" clearable size="large" />
+              <el-form-item label="蛋组">
+                <el-select
+                  v-model="groupStage"
+                  placeholder="请选择蛋组"
+                  clearable
+                  filterable
+                  size="large"
+                  :disabled="!!groupKeyword"
+                >
+                  <el-option v-for="group in groupStageOptions" :key="group" :label="group" :value="group" />
+                </el-select>
               </el-form-item>
             </div>
             <div class="actions">
@@ -1508,7 +1526,7 @@ onBeforeUnmount(() => {
 
           <el-skeleton :loading="groupSearching || loadingData" animated :rows="6">
             <template #default>
-              <div v-if="!groupHasSearched" class="empty">请输入精灵名称或蛋组关键词后点击查询</div>
+              <div v-if="!groupHasSearched" class="empty">请输入精灵名称或选择蛋组后点击查询</div>
               <div v-else-if="!groupResults.length" class="empty">未查询到匹配结果</div>
 
               <transition-group v-else name="rank" tag="div" class="group-result-list">
@@ -1653,7 +1671,7 @@ onBeforeUnmount(() => {
         <svg class="footer-github-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
           <path fill="currentColor" d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5c.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34c-.46-1.16-1.11-1.47-1.11-1.47c-.91-.62.07-.6.07-.6c1 .07 1.53 1.03 1.53 1.03c.87 1.52 2.34 1.07 2.91.83c.09-.65.35-1.09.63-1.34c-2.22-.25-4.55-1.11-4.55-4.92c0-1.11.38-2 1.03-2.71c-.1-.25-.45-1.29.1-2.64c0 0 .84-.27 2.75 1.02c.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02c.55 1.35.2 2.39.1 2.64c.65.71 1.03 1.6 1.03 2.71c0 3.82-2.34 4.66-4.57 4.91c.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2"/>
         </svg>
-        <span>项目页面</span>
+        <span>项目主页</span>
       </a>
     </footer>
   </div>
