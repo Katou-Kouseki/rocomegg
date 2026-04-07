@@ -1,5 +1,5 @@
 {
-  "total": 374,
+  "total": 384,
   "items": [
     {
       "id": 1,
@@ -868,7 +868,7 @@
     {
       "id": 154,
       "eggDiameter": "0.44-0.59",
-      "eggWeight": "15.95-22.234",
+      "eggWeight": "15.933-22.234",
       "pet": "小独角兽"
     },
     {
@@ -1497,7 +1497,7 @@
     },
     {
       "id": 261,
-      "eggDiameter": "0.2-0.23",
+      "eggDiameter": "0.2-0.24",
       "eggWeight": "1.756-2.44",
       "pet": "乌达"
     },
@@ -1636,7 +1636,7 @@
     {
       "id": 284,
       "eggDiameter": "0.344-0.51",
-      "eggWeight": "3.8-5",
+      "eggWeight": "3.531-5",
       "pet": "雪豆丁"
     },
     {
@@ -1653,7 +1653,7 @@
     },
     {
       "id": 287,
-      "eggDiameter": "0.31-0.56",
+      "eggDiameter": "0.26-0.56",
       "eggWeight": "4.305-14.148",
       "pet": "火红尾"
     },
@@ -2244,6 +2244,66 @@
       "eggDiameter": "0.39",
       "eggWeight": "3.477",
       "pet": "影狸"
+    },
+    {
+      "id": 386,
+      "eggDiameter": "0.33",
+      "eggWeight": "3.542",
+      "pet": "灵狐"
+    },
+    {
+      "id": 387,
+      "eggDiameter": "0.26",
+      "eggWeight": "13.415",
+      "pet": "火红尾"
+    },
+    {
+      "id": 388,
+      "eggDiameter": "0.38",
+      "eggWeight": "8.495",
+      "pet": "大头骨龙"
+    },
+    {
+      "id": 389,
+      "eggDiameter": "0.23",
+      "eggWeight": "0.937",
+      "pet": "小草虫"
+    },
+    {
+      "id": 390,
+      "eggDiameter": "0.34",
+      "eggWeight": "2.111",
+      "pet": "海枝枝"
+    },
+    {
+      "id": 391,
+      "eggDiameter": "0.14",
+      "eggWeight": "0.241",
+      "pet": "逗逗"
+    },
+    {
+      "id": 392,
+      "eggDiameter": "0.34",
+      "eggWeight": "30.89",
+      "pet": "海豹战士"
+    },
+    {
+      "id": 393,
+      "eggDiameter": "0.38",
+      "eggWeight": "3.531",
+      "pet": "雪豆丁"
+    },
+    {
+      "id": 394,
+      "eggDiameter": "0.45",
+      "eggWeight": "15.933",
+      "pet": "小独角兽"
+    },
+    {
+      "id": 395,
+      "eggDiameter": "0.24",
+      "eggWeight": "2.372",
+      "pet": "乌达"
     }
   ]
 }
