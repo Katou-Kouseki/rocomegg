@@ -280,11 +280,14 @@ function evaluateRow(diameter, weight, row) {
   const dPoint = isPointRange(row.diameterRange)
   const wPoint = isPointRange(row.weightRange)
 
+  const exactDiameterTolerance = 0.005
+  const exactWeightTolerance = 0.08
+
   const exact =
     dPoint &&
     wPoint &&
-    nearlyEqual(diameter, row.diameterRange.min) &&
-    nearlyEqual(weight, row.weightRange.min)
+    nearlyEqual(diameter, row.diameterRange.min, exactDiameterTolerance) &&
+    nearlyEqual(weight, row.weightRange.min, exactWeightTolerance)
 
   if (exact) return { matchType: 'exact', score: 1000 }
 
@@ -1335,7 +1338,7 @@ onBeforeUnmount(() => {
         <section class="result-card">
           <div class="result-header">
             <h2>候选精灵</h2>
-            <el-tag v-if="hasSearched && searchMode === 'exact'" type="danger" effect="light" round>完全命中优先</el-tag>
+            <el-tag v-if="hasSearched && searchMode === 'exact'" type="danger" effect="light" round>完全命中优先（含容差）</el-tag>
             <el-tag v-else-if="hasSearched && searchMode === 'matched'" type="success" effect="light" round>范围命中</el-tag>
             <el-tag v-else-if="hasSearched && searchMode === 'nearest'" type="warning" effect="light" round>近似候选</el-tag>
           </div>
@@ -1346,7 +1349,7 @@ onBeforeUnmount(() => {
               <div v-else-if="!exactResults.length && !candidates.length" class="empty">未查询到候选精灵</div>
 
               <div v-if="exactResults.length" class="exact-block">
-                <div class="sub-head">完全命中（精确记录）</div>
+                <div class="sub-head">完全命中（精确记录，容差：尺寸 ±0.005，重量 ±0.08）</div>
                 <transition-group name="rank" tag="div" class="result-list">
                   <article v-for="(item, index) in exactResults" :key="`exact-${item.petId}-${index}`" class="result-item exact-item">
                     <div class="left">
