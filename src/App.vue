@@ -287,16 +287,34 @@ function evaluateRow(diameter, weight, row) {
   const dPoint = isPointRange(row.diameterRange)
   const wPoint = isPointRange(row.weightRange)
 
-  const exactDiameterTolerance = 0.01
-  const exactWeightTolerance = 0.1
-
-  const exact =
+  const precise =
     dPoint &&
     wPoint &&
-    nearlyEqual(diameter, row.diameterRange.min, exactDiameterTolerance) &&
-    nearlyEqual(weight, row.weightRange.min, exactWeightTolerance)
+    nearlyEqual(diameter, row.diameterRange.min) &&
+    nearlyEqual(weight, row.weightRange.min)
 
-  if (exact) return { matchType: 'exact', score: 1000 }
+  if (precise) return { matchType: 'precise', score: 1200 }
+
+  if (dPoint && wPoint) {
+    const dDiff = Math.abs(diameter - row.diameterRange.min)
+    const wDiff = Math.abs(weight - row.weightRange.min)
+
+    if (dDiff <= 0.01 && wDiff <= 0.1) {
+      const dNorm = dDiff / 0.01
+      const wNorm = wDiff / 0.1
+      const distance = Math.sqrt(dNorm * dNorm + wNorm * wNorm)
+      const score = 1100 - distance * 120
+      return { matchType: 'tolerance1', score }
+    }
+
+    if (dDiff <= 0.02 && wDiff <= 0.2) {
+      const dNorm = dDiff / 0.02
+      const wNorm = wDiff / 0.2
+      const distance = Math.sqrt(dNorm * dNorm + wNorm * wNorm)
+      const score = 900 - distance * 140
+      return { matchType: 'tolerance2', score }
+    }
+  }
 
   if (dIn && wIn) {
     const dHalf = span(row.diameterRange) / 2
@@ -583,8 +601,14 @@ async function onShareLongImage() {
       return
     }
 
+    const posterIsDark = activeTheme.value === 'dark'
+    const posterBg = posterIsDark ? '#0b1220' : '#ffffff'
+    const footerTitleColor = posterIsDark ? '#e5e7eb' : '#111827'
+    const footerTextColor = posterIsDark ? '#cbd5e1' : '#4b5563'
+    const footerBorderColor = posterIsDark ? '#334155' : '#e5e7eb'
+
     const canvas = await html2canvas(target, {
-      backgroundColor: '#ffffff',
+      backgroundColor: posterBg,
       useCORS: true,
       scale: Math.max(2, window.devicePixelRatio || 1),
       windowWidth: Math.max(document.documentElement.clientWidth, target.scrollWidth),
@@ -610,7 +634,7 @@ async function onShareLongImage() {
       return
     }
 
-    ctx.fillStyle = '#ffffff'
+    ctx.fillStyle = posterBg
     ctx.fillRect(0, 0, output.width, output.height)
     ctx.drawImage(canvas, 0, 0)
 
@@ -626,16 +650,16 @@ async function onShareLongImage() {
     const qrX = output.width - qrSize - padding
     const qrY = canvas.height + (footerHeight - qrSize) / 2
 
-    ctx.fillStyle = '#111827'
+    ctx.fillStyle = footerTitleColor
     ctx.font = 'bold 34px sans-serif'
     ctx.fillText('洛克星盘-洛克王国世界工具站', padding, canvas.height + 92)
 
-    ctx.fillStyle = '#4b5563'
+    ctx.fillStyle = footerTextColor
     ctx.font = '24px sans-serif'
     ctx.fillText('扫码自动回填尺寸与重量并查询', padding, canvas.height + 138)
     ctx.fillText('长按图片可保存到手机', padding, canvas.height + 176)
 
-    ctx.strokeStyle = '#e5e7eb'
+    ctx.strokeStyle = footerBorderColor
     ctx.lineWidth = 2
     ctx.strokeRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20)
     ctx.drawImage(qr, qrX, qrY, qrSize, qrSize)
@@ -678,14 +702,70 @@ async function onSearch() {
     return { ...row, matchType, _score: score }
   })
 
-  const exactRows = scoredRows
-    .filter((r) => r.matchType === 'exact')
+  const preciseRows = scoredRows
+    .filter((r) => r.matchType === 'precise')
     .sort((a, b) => Number(a.petId) - Number(b.petId) || a.pet.localeCompare(b.pet, 'zh-CN'))
 
-  if (exactRows.length > 0) {
-    searchMode.value = 'exact'
+  if (preciseRows.length > 0) {
+    searchMode.value = 'precise'
     exactResults.value = normalizeProbabilities(
-      exactRows.map((r) => ({
+      preciseRows.map((r) => ({
+        pet: r.pet,
+        petId: r.petId,
+        eggDiameter: r.eggDiameter,
+        eggWeight: r.eggWeight,
+        _score: r._score
+      }))
+    )
+
+    const rangeRows = scoredRows.filter((r) => r.matchType === 'matched')
+    if (rangeRows.length > 0) {
+      candidates.value = normalizeProbabilities(aggregateByPet(rangeRows).slice(0, 10))
+    } else {
+      const nearestRows = scoredRows.filter((r) => r.matchType === 'nearest').sort((a, b) => b._score - a._score).slice(0, 24)
+      candidates.value = normalizeProbabilities(aggregateByPet(nearestRows).slice(0, 8))
+    }
+
+    searching.value = false
+    return
+  }
+
+  const tolerance1Rows = scoredRows
+    .filter((r) => r.matchType === 'tolerance1')
+    .sort((a, b) => b._score - a._score)
+
+  if (tolerance1Rows.length > 0) {
+    searchMode.value = 'tolerance1'
+    exactResults.value = normalizeProbabilities(
+      tolerance1Rows.map((r) => ({
+        pet: r.pet,
+        petId: r.petId,
+        eggDiameter: r.eggDiameter,
+        eggWeight: r.eggWeight,
+        _score: r._score
+      }))
+    )
+
+    const rangeRows = scoredRows.filter((r) => r.matchType === 'matched')
+    if (rangeRows.length > 0) {
+      candidates.value = normalizeProbabilities(aggregateByPet(rangeRows).slice(0, 10))
+    } else {
+      const nearestRows = scoredRows.filter((r) => r.matchType === 'nearest').sort((a, b) => b._score - a._score).slice(0, 24)
+      candidates.value = normalizeProbabilities(aggregateByPet(nearestRows).slice(0, 8))
+    }
+
+    searching.value = false
+    return
+  }
+
+  const tolerance2Rows = scoredRows
+    .filter((r) => r.matchType === 'tolerance2')
+    .sort((a, b) => b._score - a._score)
+
+  if (tolerance2Rows.length > 0) {
+    searchMode.value = 'tolerance2'
+    exactResults.value = normalizeProbabilities(
+      tolerance2Rows.map((r) => ({
         pet: r.pet,
         petId: r.petId,
         eggDiameter: r.eggDiameter,
@@ -1350,9 +1430,11 @@ onBeforeUnmount(() => {
         <section class="result-card">
           <div class="result-header">
             <h2>候选精灵</h2>
-            <el-tag v-if="hasSearched && searchMode === 'exact'" type="danger" effect="light" round>完全命中优先（含容差）</el-tag>
+            <el-tag v-if="hasSearched && searchMode === 'precise'" type="danger" effect="light" round>精准命中</el-tag>
+            <el-tag v-else-if="hasSearched && searchMode === 'tolerance1'" type="warning" effect="light" round>容差命中（尺寸 ±0.01，重量 ±0.1）</el-tag>
+            <el-tag v-else-if="hasSearched && searchMode === 'tolerance2'" type="warning" effect="light" round>容差命中（尺寸 ±0.02，重量 ±0.2）</el-tag>
             <el-tag v-else-if="hasSearched && searchMode === 'matched'" type="success" effect="light" round>范围命中</el-tag>
-            <el-tag v-else-if="hasSearched && searchMode === 'nearest'" type="warning" effect="light" round>近似候选</el-tag>
+            <el-tag v-else-if="hasSearched && searchMode === 'nearest'" type="info" effect="light" round>近似候选</el-tag>
           </div>
 
           <el-skeleton :loading="loadingData || searching" animated :rows="5">
@@ -1361,7 +1443,15 @@ onBeforeUnmount(() => {
               <div v-else-if="!exactResults.length && !candidates.length" class="empty">未查询到候选精灵</div>
 
               <div v-if="exactResults.length" class="exact-block">
-                <div class="sub-head">完全命中（精确记录，容差：尺寸 ±0.01，重量 ±0.1）</div>
+                <div class="sub-head">
+                  {{
+                    searchMode === 'precise'
+                      ? '精准命中'
+                      : searchMode === 'tolerance1'
+                        ? '容差命中（容差：尺寸 ±0.01，重量 ±0.1）'
+                        : '容差命中（容差：尺寸 ±0.02，重量 ±0.2）'
+                  }}
+                </div>
                 <transition-group name="rank" tag="div" class="result-list">
                   <article v-for="(item, index) in exactResults" :key="`exact-${item.petId}-${index}`" class="result-item exact-item">
                     <div class="left">
@@ -1507,7 +1597,7 @@ onBeforeUnmount(() => {
             <div class="grid">
               <el-form-item label="添加已有异色">
                 <div class="owned-add-row">
-                  <el-select v-model="shinyOwnedDraftName" filterable clearable placeholder="选择已有异色精灵" size="large" class="owned-add-select">
+                  <el-select v-model="shinyOwnedDraftName" clearable placeholder="选择已有异色精灵" size="large" class="owned-add-select">
                     <el-option v-for="name in shinyPetOptions" :key="`owned-opt-${name}`" :label="name" :value="name" />
                   </el-select>
                   <el-radio-group v-model="shinyOwnedDraftGender" size="large">
