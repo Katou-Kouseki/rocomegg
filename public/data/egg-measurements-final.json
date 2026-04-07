@@ -1,5 +1,5 @@
 {
-  "total": 455,
+  "total": 467,
   "items": [
     {
       "id": 1,
@@ -1299,7 +1299,7 @@
     },
     {
       "id": 228,
-      "eggDiameter": "0.1-0.144",
+      "eggDiameter": "0.1-0.15",
       "eggWeight": "0.56-0.88",
       "pet": "小鹬"
     },
@@ -1497,8 +1497,8 @@
     },
     {
       "id": 261,
-      "eggDiameter": "0.2-0.24",
-      "eggWeight": "1.756-2.44",
+      "eggDiameter": "0.19-0.24",
+      "eggWeight": "1.613-2.44",
       "pet": "乌达"
     },
     {
@@ -2223,8 +2223,8 @@
     },
     {
       "id": 382,
-      "eggDiameter": "0.31-0.32",
-      "eggWeight": "1.118-1.15",
+      "eggDiameter": "0.23-0.32",
+      "eggWeight": "0.759-1.15",
       "pet": "粉粉星"
     },
     {
@@ -2730,6 +2730,78 @@
       "eggDiameter": "0.22",
       "eggWeight": "8.625",
       "pet": "石肤蜥"
+    },
+    {
+      "id": 467,
+      "eggDiameter": "0.19",
+      "eggWeight": "4.322",
+      "pet": "粉星仔"
+    },
+    {
+      "id": 468,
+      "eggDiameter": "0.15",
+      "eggWeight": "0.81",
+      "pet": "小鹬"
+    },
+    {
+      "id": 469,
+      "eggDiameter": "0.19",
+      "eggWeight": "3.724",
+      "pet": "大耳帽兜"
+    },
+    {
+      "id": 470,
+      "eggDiameter": "0.19",
+      "eggWeight": "3.754",
+      "pet": "大耳帽兜"
+    },
+    {
+      "id": 471,
+      "eggDiameter": "0.18",
+      "eggWeight": "3.577",
+      "pet": "大耳帽兜"
+    },
+    {
+      "id": 472,
+      "eggDiameter": "0.28",
+      "eggWeight": "2.285",
+      "pet": "矿晶虫"
+    },
+    {
+      "id": 473,
+      "eggDiameter": "0.19",
+      "eggWeight": "1.613",
+      "pet": "乌达"
+    },
+    {
+      "id": 474,
+      "eggDiameter": "0.2",
+      "eggWeight": "1.479",
+      "pet": "恶魔叮"
+    },
+    {
+      "id": 475,
+      "eggDiameter": "0.23",
+      "eggWeight": "0.759",
+      "pet": "粉粉星"
+    },
+    {
+      "id": 476,
+      "eggDiameter": "0.68",
+      "eggWeight": "33.955",
+      "pet": "恶魔狼"
+    },
+    {
+      "id": 477,
+      "eggDiameter": "0.23",
+      "eggWeight": "2.239",
+      "pet": "乌达"
+    },
+    {
+      "id": 478,
+      "eggDiameter": "0.28",
+      "eggWeight": "0.98",
+      "pet": "粉粉星"
     }
   ]
 }
