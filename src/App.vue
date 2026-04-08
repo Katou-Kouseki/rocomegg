@@ -1419,7 +1419,7 @@ onBeforeUnmount(() => {
       <main class="panel">
         <section v-if="!sharingCapture" class="search-card">
           <h3>数据个数：<span style="color: var(--app-primary); font-weight: 800;">{{ datasetCount }}</span></h3>
-          <p class="chain-text">可进行查询精灵蛋数据，同时可进行投稿</p>
+          <p class="chain-text">可进行查询精灵蛋数据，同时可进行投稿，洛克王国世界交流企鹅群：1091503815</p>
         </section>
 
         <section class="search-card">
@@ -1427,10 +1427,10 @@ onBeforeUnmount(() => {
           <el-form label-position="top" class="search-form" @submit.prevent>
             <div class="grid">
               <el-form-item label="蛋尺寸" :class="{ 'shiny-field': shinyVisualActive }">
-                <el-input v-model="diameterInput" type="number" step="0.001" placeholder="例如：0.58" clearable size="large" />
+                <el-input v-model="diameterInput" type="number" step="0.001" placeholder="例如：0.58" clearable size="large" @keyup.enter="onSearch" />
               </el-form-item>
               <el-form-item label="蛋重量" :class="{ 'shiny-field': shinyVisualActive }">
-                <el-input v-model="weightInput" type="number" step="0.001" placeholder="例如：8.6" clearable size="large" />
+                <el-input v-model="weightInput" type="number" step="0.001" placeholder="例如：8.6" clearable size="large" @keyup.enter="onSearch" />
               </el-form-item>
             </div>
 
