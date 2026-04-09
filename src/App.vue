@@ -4,6 +4,9 @@ import { ElMessage } from 'element-plus'
 import { Search, Refresh, Sunny, Moon, Monitor } from '@element-plus/icons-vue'
 import html2canvas from 'html2canvas'
 import QRCode from 'qrcode'
+import mermaid from 'mermaid'
+import GenderMaleIcon from './components/icons/GenderMaleIcon.vue'
+import GenderFemaleIcon from './components/icons/GenderFemaleIcon.vue'
 import {
   EGG_GROUP_INPUT,
   SHINY_SEED_PETS,
@@ -48,6 +51,8 @@ const shinySearching = ref(false)
 const shinyHasSearched = ref(false)
 const shinyResult = ref(null)
 const shinyCandidates = ref([])
+const shinyFlowSvg = ref('')
+const shinyFlowPreviewVisible = ref(false)
 
 const shinyOwnedDraftName = ref('')
 const shinyOwnedDraftGender = ref('female')
@@ -180,7 +185,7 @@ function addShinyOwned() {
   shinyOwnedList.value = [
     ...shinyOwnedList.value,
     { name: finalName, gender: shinyOwnedDraftGender.value }
-  ].sort((a, b) => a.name.localeCompare(b.name, 'zh-CN'))
+  ]
 
   shinyOwnedDraftName.value = ''
   ElMessage.success('已添加到已有异色清单')
@@ -647,7 +652,7 @@ async function onShareLongImage() {
       color: { dark: '#111827', light: '#ffffff' }
     })
 
-    const footerHeight = 260
+    const footerHeight = 300
     const output = document.createElement('canvas')
     output.width = canvas.width
     output.height = canvas.height + footerHeight
@@ -682,6 +687,7 @@ async function onShareLongImage() {
     ctx.font = '24px sans-serif'
     ctx.fillText('扫码自动回填尺寸与重量并查询', padding, canvas.height + 138)
     ctx.fillText('长按图片可保存到手机', padding, canvas.height + 176)
+    ctx.fillText('洛克王国世界企鹅交流群：1091503815', padding, canvas.height + 214)
 
     ctx.strokeStyle = footerBorderColor
     ctx.lineWidth = 2
@@ -905,6 +911,9 @@ function onShinyReset() {
   shinyHasSearched.value = false
   shinyResult.value = null
   shinyCandidates.value = []
+  shinyFlowSvg.value = ''
+  shinyFlowPreviewVisible.value = false
+  shinyOwnedList.value = []
   shinyOwnedDraftName.value = ''
   shinyOwnedDraftGender.value = 'female'
 }
@@ -1004,6 +1013,9 @@ function buildShinyCollectionPlan({ seedFinals, candidates, groupsByPet, stageTo
   const hasOwnedFemale = (pet) => ownedGenderMap?.get(pet)?.has('female') === true
 
   const cards = []
+  const deferredSeedMaleCards = new Map()
+  const routeCards = []
+
   for (const seed of normalizedSeeds) {
     cards.push({
       title: `起点：${seed}${genderText(seed)}`,
@@ -1014,7 +1026,8 @@ function buildShinyCollectionPlan({ seedFinals, candidates, groupsByPet, stageTo
     })
 
     if (!hasOwnedMale(seed) && hasOwnedFemale(seed) && !shinyFemaleOnlyPets.has(seed) && needAsMaleDonor(seed, pendingTargets)) {
-      cards.push({
+      malePool.add(seed)
+      deferredSeedMaleCards.set(seed, {
         title: `收集：${seed}（雄性）`,
         target: seed,
         groupText: groupTextOf(seed),
@@ -1026,7 +1039,6 @@ function buildShinyCollectionPlan({ seedFinals, candidates, groupsByPet, stageTo
         },
         status: 'can'
       })
-      malePool.add(seed)
     }
   }
 
@@ -1034,7 +1046,7 @@ function buildShinyCollectionPlan({ seedFinals, candidates, groupsByPet, stageTo
     if (normalizedSeeds.includes(pet)) continue
 
     if (ownedFinalSet.has(pet)) {
-      cards.push({
+      routeCards.push({
         title: `收集：${pet}${genderText(pet)}`,
         target: pet,
         groupText: groupTextOf(pet),
@@ -1057,14 +1069,14 @@ function buildShinyCollectionPlan({ seedFinals, candidates, groupsByPet, stageTo
     const genderLabel = shinyFemaleOnlyPets.has(pet) ? '（雌性）' : (needMale ? '（雄性）' : '')
 
     if (donorMale) {
-      cards.push({
+      routeCards.push({
         title: `收集：${pet}${genderLabel}`,
         target: pet,
         groupText: groupTextOf(pet),
         desc: '',
         pair: {
           female: pet,
-          malePrefix: '已有异色雄性',
+          malePrefix: '异色雄性',
           maleName: donorMale
         },
         status: 'can'
@@ -1075,7 +1087,7 @@ function buildShinyCollectionPlan({ seedFinals, candidates, groupsByPet, stageTo
         malePool.add(pet)
       }
     } else {
-      cards.push({
+      routeCards.push({
         title: `收集：${pet}${genderLabel}`,
         target: pet,
         groupText: groupTextOf(pet),
@@ -1084,6 +1096,15 @@ function buildShinyCollectionPlan({ seedFinals, candidates, groupsByPet, stageTo
       })
     }
   }
+
+  for (const seed of normalizedSeeds) {
+    const deferredCard = deferredSeedMaleCards.get(seed)
+    if (!deferredCard) continue
+    const actuallyUsed = routeCards.some((card) => card.pair?.maleName === seed)
+    if (actuallyUsed) cards.push(deferredCard)
+  }
+
+  cards.push(...routeCards)
 
   const total = targets.length
   const doneCount = targets.filter((t) => ownedFinalSet.has(t) || normalizedSeeds.includes(t)).length
@@ -1102,6 +1123,376 @@ function buildShinyCollectionPlan({ seedFinals, candidates, groupsByPet, stageTo
     doneCount,
     progress,
     canGetSet
+  }
+}
+
+function escapeMermaidText(text) {
+  return String(text ?? '')
+    .replace(/"/g, '＂')
+    .replace(/</g, '《')
+    .replace(/>/g, '》')
+    .replace(/\n+/g, ' ')
+    .trim()
+}
+
+function buildShinyRouteMermaid(routePlan) {
+  const cards = Array.isArray(routePlan?.cards)
+    ? routePlan.cards.filter((card) => card.status !== 'blocked')
+    : []
+  if (!cards.length) return ''
+
+  const lines = ['flowchart TB']
+  const nodeIds = new Map()
+  const currentPetNode = new Map()
+  let nodeCounter = 0
+
+  const getNodeId = (key) => {
+    if (!nodeIds.has(key)) {
+      nodeCounter += 1
+      nodeIds.set(key, `n${nodeCounter}`)
+    }
+    return nodeIds.get(key)
+  }
+
+  const buildPetLabel = (text) => escapeMermaidText(text).replace(/｜/g, '<br/>')
+
+  const ensurePetNode = (key, label, className = 'petNode') => {
+    const id = getNodeId(key)
+    lines.push(`${id}["${buildPetLabel(label)}"]`)
+    lines.push(`class ${id} ${className};`)
+    return id
+  }
+
+  const stripUnusedGender = (title, keepGender) => (
+    keepGender ? title : title.replace(/（雌性）|（雄性）$/, '')
+  )
+
+  const visibleCards = cards.map((card, idx) => ({ ...card, _stepIndex: idx + 1 }))
+  const seedCards = visibleCards.filter((card) => card.status === 'done')
+  const routeCards = visibleCards.filter((card) => card.status !== 'done')
+
+  for (const card of seedCards) {
+    if (!card.target) continue
+    const label = `异色·${card.title.replace(/^起点：/, '')}`
+    const petId = ensurePetNode(`seed:${card.target}`, label, 'seedNode')
+    currentPetNode.set(card.target, petId)
+  }
+
+  for (const card of routeCards) {
+    const stepId = getNodeId(`step:${card._stepIndex}`)
+    const usedLater = routeCards.some((laterCard) =>
+      laterCard._stepIndex > card._stepIndex &&
+      card.target &&
+      (laterCard.pair?.maleName === card.target || laterCard.pair?.female === card.target)
+    )
+    const displayTitle = stripUnusedGender(card.title, usedLater)
+
+    const detailText = card.pair
+      ? `${card.pair.maleName
+          ? card.pair.female
+          : `异色·${card.pair.female}`
+        } × ${
+          card.pair.maleName
+            ? `${card.pair.malePrefix === '异色雄性' ? '异色' : card.pair.malePrefix}·${card.pair.maleName}`
+            : card.pair.malePrefix
+        }`
+      : (card.desc || '可继续推进')
+    const stepLabel = escapeMermaidText(`${detailText}｜${displayTitle}`).replace(/｜/g, '<br/>')
+
+    lines.push(`${stepId}["${stepLabel}"]`)
+    lines.push(`class ${stepId} canStep;`)
+
+    const sourceNodeIds = []
+
+    if (card.pair?.maleName) {
+      const maleSourceId = currentPetNode.get(card.pair.maleName) ||
+        ensurePetNode(`seed:${card.pair.maleName}`, `已有：${card.pair.maleName}`, 'seedNode')
+      currentPetNode.set(card.pair.maleName, maleSourceId)
+      sourceNodeIds.push(maleSourceId)
+    }
+
+    if (card.pair?.female && !card.pair.maleName) {
+      const femaleSourceId = currentPetNode.get(card.pair.female) ||
+        ensurePetNode(`seed:${card.pair.female}`, `已有：${card.pair.female}`, 'seedNode')
+      currentPetNode.set(card.pair.female, femaleSourceId)
+      sourceNodeIds.push(femaleSourceId)
+    }
+
+    for (const sourceId of sourceNodeIds) {
+      lines.push(`${sourceId} --> ${stepId}`)
+    }
+
+    if (card.target) {
+      const resultLabel = `异色·${displayTitle.replace(/^收集：/, '')}`
+      const resultId = ensurePetNode(`result:${card._stepIndex}:${card.target}`, resultLabel, 'resultNode')
+      lines.push(`${stepId} --> ${resultId}`)
+      currentPetNode.set(card.target, resultId)
+    }
+  }
+
+  lines.push('classDef canStep fill:#eff6ff,stroke:#3b82f6,color:#1d4ed8,stroke-width:2px;')
+  lines.push('classDef petNode fill:#ffffff,stroke:#cbd5e1,color:#111827,stroke-width:1.5px;')
+  lines.push('classDef seedNode fill:#fff7ed,stroke:#fb923c,color:#9a3412,stroke-width:2px;')
+  lines.push('classDef resultNode fill:#f8fafc,stroke:#64748b,color:#0f172a,stroke-width:1.5px;')
+
+  return lines.join('\n')
+}
+
+async function renderShinyFlowchart(routePlan) {
+  if (!routePlan?.cards?.length) {
+    shinyFlowSvg.value = ''
+    shinyFlowPreviewVisible.value = false
+    return
+  }
+
+  try {
+    const graphText = buildShinyRouteMermaid(routePlan)
+    if (!graphText) {
+      shinyFlowSvg.value = ''
+      shinyFlowPreviewVisible.value = false
+      return
+    }
+
+    const renderId = `shiny-flow-${Date.now()}`
+    const { svg } = await mermaid.render(renderId, graphText)
+    shinyFlowSvg.value = svg
+    shinyFlowPreviewVisible.value = false
+  } catch (err) {
+    console.error(err)
+    shinyFlowSvg.value = ''
+    shinyFlowPreviewVisible.value = false
+  }
+}
+
+function openShinyFlowPreview() {
+  if (!shinyFlowSvg.value) {
+    ElMessage.warning('暂无可预览的流程图')
+    return
+  }
+  shinyFlowPreviewVisible.value = true
+}
+
+function closeShinyFlowPreview() {
+  shinyFlowPreviewVisible.value = false
+}
+
+function getShinyFlowExportUrl() {
+  if (typeof window === 'undefined') return 'https://rocom.mfsky.qzz.io/'
+  return `${window.location.origin}${window.location.pathname}`
+}
+
+function buildShinyFlowWatermarkSvg(totalWidth, chartHeight, padding) {
+  const rows = [0.18, 0.42, 0.66, 0.9]
+  const cols = [0.18, 0.5, 0.82]
+  const color = activeTheme.value === 'dark'
+    ? 'rgba(148,163,184,0.08)'
+    : 'rgba(148,163,184,0.12)'
+
+  return rows.flatMap((row) =>
+    cols.map((col, index) => {
+      const x = Math.round(totalWidth * col)
+      const y = Math.round((chartHeight + padding * 2) * row)
+      const rotate = index % 2 === 0 ? -18 : -14
+      return `<text x="${x}" y="${y}" text-anchor="middle" font-size="34" font-weight="800" letter-spacing="6" fill="${color}" transform="rotate(${rotate} ${x} ${y})">洛克星盘 · 异色路线规划</text>`
+    })
+  ).join('')
+}
+
+async function buildShinyFlowExportSvg() {
+  if (!shinyFlowSvg.value) return ''
+
+  const parser = new DOMParser()
+  const svgDoc = parser.parseFromString(shinyFlowSvg.value, 'image/svg+xml')
+  const sourceSvg = svgDoc.documentElement
+  const serializer = new XMLSerializer()
+  const svgNs = 'http://www.w3.org/2000/svg'
+
+  const viewBoxText = sourceSvg.getAttribute('viewBox') || '0 0 1600 1200'
+  const viewBoxParts = viewBoxText.trim().split(/\s+/).map(Number)
+  const viewBoxX = Number.isFinite(viewBoxParts[0]) ? viewBoxParts[0] : 0
+  const viewBoxY = Number.isFinite(viewBoxParts[1]) ? viewBoxParts[1] : 0
+  const chartWidth = Math.max(viewBoxParts[2] || Number(sourceSvg.getAttribute('width')) || 1600, 1600)
+  const chartHeight = Math.max(viewBoxParts[3] || Number(sourceSvg.getAttribute('height')) || 1200, 1200)
+
+  const footerHeight = 220
+  const totalHeight = chartHeight + footerHeight
+  const footerTop = viewBoxY + chartHeight
+  const footerTextY = footerTop + 78
+  const footerSubTextY = footerTop + 116
+  const qrSize = 150
+  const qrX = viewBoxX + chartWidth - qrSize - 28
+  const qrY = footerTop + 20
+
+  const backgroundColor = activeTheme.value === 'dark' ? '#020617' : '#ffffff'
+  const footerTitleColor = activeTheme.value === 'dark' ? '#e5e7eb' : '#111827'
+  const footerLineColor = activeTheme.value === 'dark' ? '#334155' : '#e5e7eb'
+  const qrDataUrl = await QRCode.toDataURL(getShinyFlowExportUrl(), {
+    width: qrSize * 2,
+    margin: 1,
+    color: {
+      dark: '#111827',
+      light: '#ffffff'
+    }
+  })
+
+  sourceSvg.setAttribute('xmlns', svgNs)
+  sourceSvg.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink')
+  sourceSvg.setAttribute('width', String(chartWidth))
+  sourceSvg.setAttribute('height', String(totalHeight))
+  sourceSvg.setAttribute('viewBox', `${viewBoxX} ${viewBoxY} ${chartWidth} ${totalHeight}`)
+  sourceSvg.setAttribute('overflow', 'visible')
+
+  const watermarkLayer = svgDoc.createElementNS(svgNs, 'g')
+  watermarkLayer.setAttribute('aria-hidden', 'true')
+
+  const rows = [0.18, 0.42, 0.66, 0.9]
+  const cols = [0.18, 0.5, 0.82]
+  const watermarkColor = activeTheme.value === 'dark'
+    ? 'rgba(148,163,184,0.08)'
+    : 'rgba(148,163,184,0.12)'
+
+  rows.forEach((row) => {
+    cols.forEach((col, index) => {
+      const x = Math.round(viewBoxX + chartWidth * col)
+      const y = Math.round(viewBoxY + chartHeight * row)
+      const rotate = index % 2 === 0 ? -18 : -14
+      const text = svgDoc.createElementNS(svgNs, 'text')
+      text.setAttribute('x', String(x))
+      text.setAttribute('y', String(y))
+      text.setAttribute('text-anchor', 'middle')
+      text.setAttribute('font-size', '34')
+      text.setAttribute('font-weight', '800')
+      text.setAttribute('letter-spacing', '6')
+      text.setAttribute('fill', watermarkColor)
+      text.setAttribute('transform', `rotate(${rotate} ${x} ${y})`)
+      text.textContent = '洛克星盘 · 异色路线规划'
+      watermarkLayer.appendChild(text)
+    })
+  })
+
+  sourceSvg.appendChild(watermarkLayer)
+
+  const footerBg = svgDoc.createElementNS(svgNs, 'rect')
+  footerBg.setAttribute('x', String(viewBoxX))
+  footerBg.setAttribute('y', String(footerTop))
+  footerBg.setAttribute('width', String(chartWidth))
+  footerBg.setAttribute('height', String(footerHeight))
+  footerBg.setAttribute('fill', backgroundColor)
+  sourceSvg.appendChild(footerBg)
+
+  const footerLine = svgDoc.createElementNS(svgNs, 'line')
+  footerLine.setAttribute('x1', String(viewBoxX))
+  footerLine.setAttribute('y1', String(footerTop))
+  footerLine.setAttribute('x2', String(viewBoxX + chartWidth))
+  footerLine.setAttribute('y2', String(footerTop))
+  footerLine.setAttribute('stroke', footerLineColor)
+  footerLine.setAttribute('stroke-width', '1.5')
+  sourceSvg.appendChild(footerLine)
+
+  const footerTitle = svgDoc.createElementNS(svgNs, 'text')
+  footerTitle.setAttribute('x', String(viewBoxX + 28))
+  footerTitle.setAttribute('y', String(footerTextY))
+  footerTitle.setAttribute('fill', footerTitleColor)
+  footerTitle.setAttribute('font-size', '34')
+  footerTitle.setAttribute('font-weight', '800')
+  footerTitle.textContent = '洛克星盘-洛克王国世界工具站'
+  sourceSvg.appendChild(footerTitle)
+
+  const footerSubtitle = svgDoc.createElementNS(svgNs, 'text')
+  footerSubtitle.setAttribute('x', String(viewBoxX + 28))
+  footerSubtitle.setAttribute('y', String(footerSubTextY))
+  footerSubtitle.setAttribute('fill', footerTitleColor)
+  footerSubtitle.setAttribute('font-size', '22')
+  footerSubtitle.setAttribute('font-weight', '500')
+  footerSubtitle.textContent = '洛克王国世界企鹅交流群：1091503815'
+  sourceSvg.appendChild(footerSubtitle)
+
+  const qrImage = svgDoc.createElementNS(svgNs, 'image')
+  qrImage.setAttribute('href', qrDataUrl)
+  qrImage.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', qrDataUrl)
+  qrImage.setAttribute('x', String(qrX))
+  qrImage.setAttribute('y', String(qrY))
+  qrImage.setAttribute('width', String(qrSize))
+  qrImage.setAttribute('height', String(qrSize))
+  qrImage.setAttribute('preserveAspectRatio', 'xMidYMid meet')
+  sourceSvg.appendChild(qrImage)
+
+  return serializer.serializeToString(sourceSvg)
+}
+
+
+
+async function downloadShinyFlowSvg() {
+  if (!shinyFlowSvg.value) {
+    ElMessage.warning('暂无可保存的流程图')
+    return
+  }
+
+  try {
+    const brandedSvg = await buildShinyFlowExportSvg()
+    const blob = new Blob([brandedSvg], {
+      type: 'image/svg+xml;charset=utf-8'
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'rocom-shiny-flow.svg'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } catch (err) {
+    console.error(err)
+    ElMessage.warning('SVG 导出失败，请重试')
+  }
+}
+
+async function downloadShinyFlowPng() {
+  if (!shinyFlowSvg.value) {
+    ElMessage.warning('暂无可保存的流程图')
+    return
+  }
+
+  try {
+    const brandedSvg = await buildShinyFlowExportSvg()
+    const svgDataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(brandedSvg)}`
+    const image = new Image()
+    image.decoding = 'sync'
+
+    await new Promise((resolve, reject) => {
+      image.onload = resolve
+      image.onerror = () => reject(new Error('SVG 图片加载失败'))
+      image.src = svgDataUrl
+    })
+
+    const width = Math.max(
+      1,
+      image.naturalWidth || image.width || 1
+    )
+    const height = Math.max(
+      1,
+      image.naturalHeight || image.height || 1
+    )
+    const scale = 2
+    const canvas = document.createElement('canvas')
+    canvas.width = width * scale
+    canvas.height = height * scale
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) {
+      ElMessage.warning('PNG 导出失败：无法创建画布')
+      return
+    }
+
+    ctx.setTransform(scale, 0, 0, scale, 0, 0)
+    ctx.fillStyle = activeTheme.value === 'dark' ? '#020617' : '#ffffff'
+    ctx.fillRect(0, 0, width, height)
+    ctx.drawImage(image, 0, 0, width, height)
+
+    downloadDataUrl(canvas.toDataURL('image/png'), 'rocom-shiny-flow.png')
+  } catch (err) {
+    console.error(err)
+    ElMessage.warning(`PNG 导出失败：${err instanceof Error ? err.message : '请重试'}`)
   }
 }
 
@@ -1194,6 +1585,9 @@ async function onShinySearch() {
   shinyResult.value = {
     routePlan
   }
+
+  await nextTick()
+  await renderShinyFlowchart(routePlan)
 
   const canGetSet = routePlan.canGetSet || new Set()
   shinyCandidates.value = candidates
@@ -1373,6 +1767,11 @@ function applySharedParamsFromUrl() {
 
 onMounted(async () => {
   initThemeMode()
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: activeTheme.value === 'dark' ? 'dark' : 'default',
+    securityLevel: 'loose'
+  })
   await loadDataset()
   applySharedParamsFromUrl()
 })
@@ -1593,7 +1992,7 @@ onBeforeUnmount(() => {
                   v-model="groupStage"
                   placeholder="请选择蛋组"
                   clearable
-                  filterable
+
                   size="large"
                   :disabled="!!groupKeyword"
                 >
@@ -1640,22 +2039,36 @@ onBeforeUnmount(() => {
                   <el-select v-model="shinyOwnedDraftName" clearable placeholder="选择已有异色精灵" size="large" class="owned-add-select">
                     <el-option v-for="name in shinyPetOptions" :key="`owned-opt-${name}`" :label="name" :value="name" />
                   </el-select>
-                  <el-radio-group v-model="shinyOwnedDraftGender" size="large">
-                    <el-radio-button label="female">雌性</el-radio-button>
-                    <el-radio-button label="male">雄性</el-radio-button>
+                  <el-radio-group v-model="shinyOwnedDraftGender" size="large" class="owned-gender-group">
+                    <el-radio-button label="female" class="owned-gender-female">
+                      <span style="display: inline-flex; align-items: center; gap: 6px;">
+                        <GenderFemaleIcon />
+                        <span>雌性</span>
+                      </span>
+                    </el-radio-button>
+                    <el-radio-button label="male" class="owned-gender-male">
+                      <span style="display: inline-flex; align-items: center; gap: 6px;">
+                        <GenderMaleIcon />
+                        <span>雄性</span>
+                      </span>
+                    </el-radio-button>
                   </el-radio-group>
                   <el-button class="query-btn owned-add-btn" type="primary" size="large" @click="addShinyOwned">+</el-button>
                 </div>
                 <div v-if="shinyOwnedList.length" class="group-tags">
                   <el-tag
-                    v-for="(item, idx) in shinyOwnedList"
-                    :key="`owned-${idx}-${item.name}-${item.gender}`"
+                    v-for="item in shinyOwnedList"
+                    :key="`owned-${item.name}-${item.gender}`"
+                    :class="item.gender === 'female' ? 'owned-tag-female' : 'owned-tag-male'"
                     closable
                     effect="light"
-                    round
                     @close="removeShinyOwned(item)"
                   >
-                    {{ item.name }}·{{ item.gender === 'female' ? '雌' : '雄' }}
+                    <span style="display: inline-flex; align-items: center; gap: 6px;">
+                      <GenderFemaleIcon v-if="item.gender === 'female'" />
+                      <GenderMaleIcon v-else />
+                      <span>{{ item.name }}</span>
+                    </span>
                   </el-tag>
                 </div>
               </el-form-item>
@@ -1745,7 +2158,7 @@ onBeforeUnmount(() => {
 
         <section class="result-card" v-else>
           <div class="result-header">
-            <h2>异色孵化结果</h2>
+            <h2>异色路线规划</h2>
             <el-tag v-if="shinyHasSearched" type="success" effect="light" round>异色父系 {{ shinyCandidates.length }} 个</el-tag>
             <el-tag v-else type="info" effect="light" round>待查询</el-tag>
           </div>
@@ -1758,39 +2171,68 @@ onBeforeUnmount(() => {
                 <article v-if="shinyResult.routePlan" class="result-item group-summary group-summary-card">
                   <div class="left">
                     <div class="title-row">
-                      <h3>集齐异色路线规划</h3>
+                      <h3>洛克星盘-异色孵化流程图</h3>
                       <span class="pet-id">完成 {{ shinyResult.routePlan.doneCount }} / {{ shinyResult.routePlan.total }}</span>
                     </div>
 
-                    <div class="group-tags">
-                      <el-tag v-for="name in shinyResult.routePlan.targets" :key="`route-target-${name}`" effect="light" round>{{ name }}</el-tag>
-                    </div>
-
-                    <div class="route-progress">
-                      <div class="route-progress-head">
-                        <span>当前进度</span>
-                        <span>{{ shinyResult.routePlan.progress }}%</span>
-                      </div>
-                      <el-progress :percentage="shinyResult.routePlan.progress" :stroke-width="12" :show-text="false" />
-                    </div>
-
-                    <div class="route-cards">
-                      <article
-                        v-for="(card, idx) in shinyResult.routePlan.cards.filter((x) => x.status !== 'blocked')"
-                        :key="`route-card-${idx}`"
-                        class="route-card"
-                        :class="{ done: card.status === 'done', can: card.status === 'can' }"
-                      >
-                        <div class="title-row">
-                          <h3 class="group-pet-name">{{ card.title }}</h3>
-                          <span class="pet-id route-group-tag">{{ card.groupText || '无蛋组' }}</span>
+                    <div v-if="shinyFlowSvg" class="shiny-flow-card">
+                      <div class="shiny-flow-toolbar">
+                        <div></div>
+                        <div class="shiny-flow-action-group">
+                          <button type="button" class="shiny-flow-btn shiny-flow-save-btn" @click="downloadShinyFlowPng">保存 PNG</button>
                         </div>
-                        <p v-if="card.status === 'can' && card.pair" class="chain-text">
-                          普通雌性 <span class="sex-female">{{ card.pair.female }}</span> × {{ card.pair.malePrefix }} <span v-if="card.pair.maleName" class="sex-male">{{ card.pair.maleName }}</span>。
-                        </p>
-                        <p v-else class="chain-text">{{ card.desc }}</p>
-                      </article>
+                      </div>
+                      <div class="shiny-flow-wrap shiny-flow-preview-trigger" @click="openShinyFlowPreview">
+                        <div class="shiny-flow-watermark" aria-hidden="true">
+                          <span>洛克星盘 · 异色路线规划</span>
+                          <span>洛克星盘 · 异色路线规划</span>
+                          <span>洛克星盘 · 异色路线规划</span>
+                          <span>洛克星盘 · 异色路线规划</span>
+                          <span>洛克星盘 · 异色路线规划</span>
+                          <span>洛克星盘 · 异色路线规划</span>
+                          <span>洛克星盘 · 异色路线规划</span>
+                          <span>洛克星盘 · 异色路线规划</span>
+                        </div>
+                        <div class="shiny-flow-canvas" v-html="shinyFlowSvg"></div>
+                      </div>
                     </div>
+
+                    <el-dialog
+                      v-model="shinyFlowPreviewVisible"
+                      fullscreen
+                      append-to-body
+                      class="shiny-flow-preview-dialog"
+                      :show-close="false"
+                    >
+                      <template #header>
+                        <div class="shiny-flow-preview-head">
+                          <div class="shiny-flow-preview-title">
+                            <h3 class="group-pet-name">洛克星盘-异色孵化流程图</h3>
+                          </div>
+                          <div class="shiny-flow-action-group">
+                            <button type="button" class="shiny-flow-btn shiny-flow-save-btn" @click="downloadShinyFlowPng">保存 PNG</button>
+                            <button type="button" class="shiny-flow-btn" @click="closeShinyFlowPreview">关闭</button>
+                          </div>
+                        </div>
+                      </template>
+                      <div class="shiny-flow-preview-body">
+                        <div class="shiny-flow-wrap shiny-flow-wrap-preview">
+                          <div class="shiny-flow-watermark" aria-hidden="true">
+                            <span>洛克星盘 · 异色路线规划</span>
+                            <span>洛克星盘 · 异色路线规划</span>
+                            <span>洛克星盘 · 异色路线规划</span>
+                            <span>洛克星盘 · 异色路线规划</span>
+                            <span>洛克星盘 · 异色路线规划</span>
+                            <span>洛克星盘 · 异色路线规划</span>
+                            <span>洛克星盘 · 异色路线规划</span>
+                            <span>洛克星盘 · 异色路线规划</span>
+                          </div>
+                          <div class="shiny-flow-canvas" v-html="shinyFlowSvg"></div>
+                        </div>
+                      </div>
+                    </el-dialog>
+
+
                   </div>
                 </article>
 
@@ -2232,8 +2674,198 @@ onBeforeUnmount(() => {
   display: flex;
   justify-content: space-between;
   color: var(--app-text-soft);
-  font-size: 12px;
-  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.shiny-flow-card {
+  margin-top: 10px;
+}
+
+.shiny-flow-toolbar {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.shiny-flow-action-group {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.shiny-flow-btn {
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: #fff;
+  color: #334155;
+  border-radius: 10px;
+  height: 34px;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.shiny-flow-btn:hover {
+  border-color: rgba(59, 130, 246, 0.45);
+  color: #1d4ed8;
+}
+
+.shiny-flow-save-btn {
+  color: #0f766e;
+}
+
+.shiny-flow-wrap {
+  position: relative;
+  margin-top: 10px;
+  overflow: auto;
+  border-radius: 14px;
+  background: rgba(248, 250, 252, 0.9);
+  padding: 12px;
+}
+
+.shiny-flow-watermark {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.shiny-flow-watermark span {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 420px;
+  font-size: clamp(18px, 3.2vw, 34px);
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: rgba(148, 163, 184, 0.14);
+  white-space: nowrap;
+}
+
+.shiny-flow-watermark span:nth-child(1) {
+  top: 10%;
+  left: 2%;
+  transform: rotate(-18deg);
+}
+
+.shiny-flow-watermark span:nth-child(2) {
+  top: 12%;
+  left: 48%;
+  transform: rotate(-16deg);
+}
+
+.shiny-flow-watermark span:nth-child(3) {
+  top: 36%;
+  left: -2%;
+  transform: rotate(-18deg);
+}
+
+.shiny-flow-watermark span:nth-child(4) {
+  top: 38%;
+  left: 44%;
+  transform: rotate(-16deg);
+}
+
+.shiny-flow-watermark span:nth-child(5) {
+  top: 62%;
+  left: 0;
+  transform: rotate(-18deg);
+}
+
+.shiny-flow-watermark span:nth-child(6) {
+  top: 64%;
+  left: 50%;
+  transform: rotate(-16deg);
+}
+
+.shiny-flow-watermark span:nth-child(7) {
+  top: 84%;
+  left: 8%;
+  transform: rotate(-18deg);
+}
+
+.shiny-flow-watermark span:nth-child(8) {
+  top: 86%;
+  left: 56%;
+  transform: rotate(-16deg);
+}
+
+.shiny-flow-preview-trigger {
+  cursor: zoom-in;
+}
+
+.shiny-flow-canvas {
+  position: relative;
+  z-index: 1;
+  min-width: 100%;
+}
+
+.shiny-flow-canvas :deep(svg) {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: auto;
+}
+
+.shiny-flow-preview-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.shiny-flow-preview-title {
+  min-width: 0;
+}
+
+.shiny-flow-preview-body {
+  height: calc(100vh - 92px);
+}
+
+.shiny-flow-wrap-preview {
+  height: 100%;
+  margin-top: 0;
+}
+
+@media (max-width: 768px) {
+  .shiny-flow-preview-title {
+    display: none;
+  }
+
+  .shiny-flow-preview-head {
+    justify-content: flex-end;
+  }
+}
+
+.page.theme-dark .shiny-flow-card {
+}
+
+.page.theme-dark .shiny-flow-btn {
+  background: rgba(15, 23, 42, 0.92);
+  color: #e2e8f0;
+  border-color: rgba(71, 85, 105, 0.7);
+}
+
+.page.theme-dark .shiny-flow-btn:hover {
+  color: #93c5fd;
+  border-color: rgba(96, 165, 250, 0.7);
+}
+
+.page.theme-dark .shiny-flow-wrap {
+  background: rgba(2, 6, 23, 0.92);
+}
+
+.page.theme-dark .shiny-flow-watermark span {
+  color: rgba(148, 163, 184, 0.1);
 }
 
 .route-cards {
@@ -2270,7 +2902,7 @@ onBeforeUnmount(() => {
 }
 
 .sex-male {
-  color: #22c55e;
+  color: #2563eb;
   font-weight: 700;
 }
 
@@ -2290,6 +2922,50 @@ onBeforeUnmount(() => {
 
 .owned-add-select {
   width: 100%;
+}
+
+.owned-gender-group :deep(.el-radio-button__inner) {
+  min-width: 72px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.owned-gender-female :deep(.el-radio-button__inner) {
+  color: #dc2626;
+  border-color: #fca5a5;
+  background: #fff1f2;
+}
+
+.owned-gender-female :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
+  color: #fff;
+  background: #ef4444;
+  border-color: #ef4444;
+  box-shadow: -1px 0 0 0 #ef4444;
+}
+
+.owned-gender-male :deep(.el-radio-button__inner) {
+  color: #1d4ed8;
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.owned-gender-male :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
+  color: #fff;
+  background: #2563eb;
+  border-color: #2563eb;
+  box-shadow: -1px 0 0 0 #2563eb;
+}
+
+.owned-tag-female {
+  color: #dc2626 !important;
+  border-color: #fca5a5 !important;
+  background: #fff1f2 !important;
+}
+
+.owned-tag-male {
+  color: #1d4ed8 !important;
+  border-color: #93c5fd !important;
+  background: #eff6ff !important;
 }
 
 .owned-add-btn {
