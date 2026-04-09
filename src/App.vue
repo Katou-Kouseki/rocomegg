@@ -489,6 +489,35 @@ function buildGroupIndex(masterNames, evolutionChains) {
   return { groupsByPet, stageToBase, stageToFinal, stageToChainText, baseToMembers, baseToChain, baseToChains, allPetNames }
 }
 
+function extractEggMeasurementRows(eggJson) {
+  if (Array.isArray(eggJson?.items)) return eggJson.items
+
+  const groups = Array.isArray(eggJson?.groups) ? eggJson.groups : []
+  const rows = []
+
+  for (const group of groups) {
+    const pet = group?.pet
+    const petId = group?.petId ?? '--'
+    if (!pet) continue
+
+    const rangeItems = Array.isArray(group?.rangeItems) ? group.rangeItems : []
+    const exactItems = Array.isArray(group?.exactItems) ? group.exactItems : []
+
+    for (const item of [...rangeItems, ...exactItems]) {
+      if (!item) continue
+      rows.push({
+        id: item.id,
+        pet,
+        petId,
+        eggDiameter: item.eggDiameter,
+        eggWeight: item.eggWeight
+      })
+    }
+  }
+
+  return rows
+}
+
 async function loadDataset() {
   loadingData.value = true
   try {
@@ -542,7 +571,7 @@ async function loadDataset() {
     }
     shinyPets.value = shinySet
 
-    const rows = Array.isArray(eggJson?.items) ? eggJson.items : []
+    const rows = extractEggMeasurementRows(eggJson)
     rawItems.value = rows
       .map((row) => {
         const diameterRange = parseRange(row.eggDiameter)
@@ -551,7 +580,7 @@ async function loadDataset() {
         return {
           id: row.id,
           pet: row.pet,
-          petId: idMap.get(row.pet) ?? '--',
+          petId: row.petId ?? idMap.get(row.pet) ?? '--',
           eggDiameter: row.eggDiameter,
           eggWeight: row.eggWeight,
           diameterRange,
