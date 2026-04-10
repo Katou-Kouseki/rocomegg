@@ -1,0 +1,800 @@
+:root {
+    --tool-page-card-radius: 24px;
+    --tool-page-card-bg: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.3),
+        rgba(255, 255, 255, 0.14)
+    );
+    --tool-page-card-border: rgba(255, 255, 255, 0.24);
+    --tool-page-card-highlight: rgba(255, 255, 255, 0.28);
+    --tool-page-card-shadow: 0 14px 30px rgba(15, 23, 42, 0.14);
+    --tool-page-card-blur: blur(18px) saturate(160%);
+
+    --tool-page-card-dark-bg: linear-gradient(
+        180deg,
+        rgba(15, 23, 42, 0.34),
+        rgba(15, 23, 42, 0.16)
+    );
+    --tool-page-card-dark-border: rgba(148, 163, 184, 0.16);
+    --tool-page-card-dark-highlight: rgba(148, 163, 184, 0.1);
+    --tool-page-card-dark-shadow: 0 18px 36px rgba(2, 6, 23, 0.38);
+
+    --tool-page-title-color: var(--app-primary, #3f83bd);
+    --tool-page-desc-color: var(--app-text-soft, #5f5d72);
+    --tool-page-heading-dark: #cbd5e1;
+    --tool-page-label-light: #1d4ed8;
+    --tool-page-label-dark: #93c5fd;
+
+    --tool-page-primary-gradient: linear-gradient(
+        135deg,
+        var(--app-primary, #3b82f6),
+        var(--app-primary-soft, #60a5fa)
+    );
+    --tool-page-primary-shadow: 0 10px 20px rgba(37, 99, 235, 0.22);
+    --tool-page-secondary-bg: #eff6ff;
+    --tool-page-secondary-color: var(--app-primary, #2563eb);
+    --tool-page-secondary-border: rgba(191, 219, 254, 0.9);
+    --tool-page-button-dark-bg: linear-gradient(
+        180deg,
+        rgba(30, 41, 59, 0.9),
+        rgba(15, 23, 42, 0.82)
+    );
+    --tool-page-button-dark-border: rgba(96, 165, 250, 0.28);
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) {
+    display: grid;
+    gap: 18px;
+    width: min(100%, 1180px);
+    margin: 0 auto;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(.search-card, .result-card),
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(.size-hero-card, .breeding-hero-card, .shiny-hero-card),
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(
+        .result-item,
+        .empty,
+        .empty-state,
+        .share-query-meta,
+        .shiny-flow-wrap
+    ) {
+    border-radius: var(--tool-page-card-radius) !important;
+    background: var(--tool-page-card-bg) !important;
+    border: 1px solid var(--tool-page-card-border) !important;
+    box-shadow:
+        inset 0 1px 0 var(--tool-page-card-highlight),
+        var(--tool-page-card-shadow) !important;
+    backdrop-filter: var(--tool-page-card-blur) !important;
+    -webkit-backdrop-filter: var(--tool-page-card-blur) !important;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(.search-card, .result-card),
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(.size-hero-card, .breeding-hero-card, .shiny-hero-card) {
+    overflow: hidden;
+    position: relative;
+    padding: 22px;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(.size-hero-card, .breeding-hero-card, .shiny-hero-card) {
+    padding: 28px 22px !important;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .page-hero__content {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 14px;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .page-hero__title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .page-hero__title {
+    margin: 0 !important;
+    color: var(--tool-page-title-color) !important;
+    font-size: clamp(28px, 4vw, 40px) !important;
+    line-height: 1.15 !important;
+    letter-spacing: 0.02em !important;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .page-hero__desc,
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .page-hero__meta {
+    color: var(--tool-page-desc-color) !important;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .page-hero__home-btn {
+    width: fit-content;
+    min-height: 42px;
+    padding: 0 18px;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 999px;
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.28),
+        rgba(255, 255, 255, 0.14)
+    );
+    color: #1a1b21;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.24),
+        0 10px 20px rgba(15, 23, 42, 0.12);
+    backdrop-filter: blur(14px) saturate(150%);
+    -webkit-backdrop-filter: blur(14px) saturate(150%);
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .page-hero__home-btn:hover {
+    transform: translateY(-1px);
+    border-color: rgba(255, 255, 255, 0.34);
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.34),
+        rgba(255, 255, 255, 0.18)
+    );
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.28),
+        0 14px 24px rgba(15, 23, 42, 0.14);
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(.section-title, .result-header h2, .search-card h2, .result-card h2) {
+    color: var(--tool-page-title-color) !important;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .result-header,
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .result-header {
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .title-row {
+    gap: 8px;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(
+        .page-hero__desc,
+        .page-hero__meta,
+        .empty,
+        .empty-state__desc,
+        .left p,
+        .chain-text
+    ) {
+    line-height: 1.75;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(.group-pet-name, .left h3, .result-item .left h3, .empty-state__title) {
+    color: var(--app-text, #1a1b21);
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .group-pet-name {
+    margin: 0 !important;
+    font-size: 18px;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .left h3,
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .result-item
+    .left
+    h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .left p {
+    margin: 3px 0;
+    font-size: 13px;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .chain-text {
+    margin: 2px 0 4px;
+    font-size: 12px;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(.sub-head, .prob, .dataset-value) {
+    color: var(--tool-page-title-color) !important;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(.group-summary, .exact-item) {
+    background: var(--tool-page-card-bg) !important;
+    border: 1px solid var(--tool-page-card-border) !important;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) :is(.pet-id) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 0 8px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    color: var(--app-primary, #3f83bd);
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.42),
+        rgba(255, 255, 255, 0.18)
+    );
+    border: 1px solid rgba(191, 219, 254, 0.72);
+    border-radius: 999px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.32),
+        0 6px 14px rgba(15, 23, 42, 0.08);
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .el-tag {
+    --el-tag-bg-color: transparent !important;
+    --el-tag-border-color: transparent !important;
+    --el-tag-hover-color: transparent !important;
+    min-height: 26px;
+    padding: 0 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #245b95 !important;
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.44),
+        rgba(255, 255, 255, 0.2)
+    ) !important;
+    border: 1px solid rgba(191, 219, 254, 0.62) !important;
+    border-radius: 999px !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.34),
+        0 8px 18px rgba(15, 23, 42, 0.08) !important;
+    backdrop-filter: blur(14px) saturate(155%);
+    -webkit-backdrop-filter: blur(14px) saturate(155%);
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .el-tag
+    .el-tag__content {
+    line-height: 1;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .result-header
+    .el-tag {
+    padding: 0 12px;
+    min-height: 28px;
+    font-size: 11px;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(.empty, .empty-state) {
+    min-height: 240px;
+    padding: 20px 12px;
+    display: grid;
+    place-items: center;
+    text-align: center;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .empty {
+    padding: 28px 10px;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .empty-state__icon {
+    background: rgba(59, 130, 246, 0.12);
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .share-query-meta,
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .shiny-flow-wrap {
+    padding: 12px !important;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .result-item {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 14px;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .group-result-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .group-summary-card {
+    margin-bottom: 12px;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .group-item {
+    grid-template-columns: 1fr;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .group-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .sub-head {
+    font-weight: 700;
+    margin: 8px 2px 10px;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .el-form-item__label {
+    color: var(--tool-page-title-color) !important;
+    font-weight: 700 !important;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .actions {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+    width: 100%;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .actions
+    .el-button {
+    min-width: 120px;
+    flex: 1 1 100%;
+    width: 100%;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .actions
+    .el-button
+    + .el-button {
+    margin-left: 0 !important;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(.query-btn, .reset-btn, .submit-btn, .share-btn) {
+    min-height: 44px;
+    border-radius: 999px !important;
+    padding: 12px 26px !important;
+    font-weight: 700 !important;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .query-btn {
+    border: none !important;
+    background: var(--tool-page-primary-gradient) !important;
+    box-shadow: var(--tool-page-primary-shadow);
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .reset-btn {
+    background: var(--tool-page-secondary-bg) !important;
+    color: var(--tool-page-title-color) !important;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .submit-btn {
+    border: 1px solid var(--tool-page-secondary-border) !important;
+    background: rgba(255, 255, 255, 0.88) !important;
+    color: var(--tool-page-title-color) !important;
+    box-shadow: 0 8px 18px rgba(148, 163, 184, 0.12);
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .share-btn {
+    border: 1px dashed var(--app-primary-soft, #60a5fa) !important;
+    background: rgba(239, 246, 255, 0.92) !important;
+    color: var(--tool-page-title-color) !important;
+    box-shadow: 0 8px 18px rgba(148, 163, 184, 0.12);
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(.query-btn, .reset-btn, .submit-btn, .share-btn):hover {
+    transform: translateY(-1px);
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .shiny-flow-btn {
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    background: rgba(255, 255, 255, 0.88);
+    color: #334155;
+    border-radius: 999px;
+    min-height: 38px;
+    padding: 0 14px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.28),
+        0 8px 18px rgba(15, 23, 42, 0.1);
+    backdrop-filter: blur(14px) saturate(150%);
+    -webkit-backdrop-filter: blur(14px) saturate(150%);
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        background 0.2s ease;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .shiny-flow-btn:hover {
+    transform: translateY(-1px);
+    border-color: rgba(59, 130, 246, 0.45);
+    color: #1d4ed8;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.32),
+        0 10px 20px rgba(15, 23, 42, 0.12);
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .shiny-flow-save-btn {
+    color: #0f766e;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(.el-input__wrapper, .el-select__wrapper, .el-select-v2__wrapper) {
+    border-radius: 14px;
+    background: #f8fbff;
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.12) inset !important;
+    min-height: 44px;
+    align-items: center;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(
+        .el-input__wrapper:hover,
+        .el-select__wrapper:hover,
+        .el-select-v2__wrapper:hover
+    ) {
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.18) inset !important;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(
+        .el-input__wrapper.is-focus,
+        .el-select__wrapper.is-focused,
+        .el-select-v2__wrapper.is-focused
+    ) {
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.24) inset !important;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(
+        .el-input__inner,
+        .el-select__selected-item,
+        .el-select-v2__selected-item
+    ) {
+    color: #0f172a;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(
+        .el-input__inner::placeholder,
+        .el-select__placeholder,
+        .el-select-v2__placeholder
+    ) {
+    color: #475569;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .el-input__inner {
+    height: 42px;
+    line-height: 42px;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .el-input__inner:focus {
+    outline: none !important;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .el-switch {
+    --el-switch-on-color: var(--app-primary, #3b82f6);
+    --el-switch-off-color: rgba(148, 163, 184, 0.45);
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .el-switch__label {
+    color: var(--tool-page-desc-color) !important;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .el-radio-group {
+    gap: 8px;
+}
+
+:is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .el-radio-button__inner {
+    border-radius: 12px !important;
+    box-shadow: none !important;
+    font-weight: 700;
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(.search-card, .result-card),
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(.size-hero-card, .breeding-hero-card, .shiny-hero-card),
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(
+        .result-item,
+        .empty,
+        .empty-state,
+        .share-query-meta,
+        .shiny-flow-wrap
+    ),
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(.group-summary, .exact-item) {
+    border-color: var(--tool-page-card-dark-border) !important;
+    box-shadow:
+        var(--tool-page-card-dark-shadow),
+        inset 0 1px 0 var(--tool-page-card-dark-highlight) !important;
+}
+
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(.page-hero__title, .page-hero__desc, .page-hero__meta),
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(.section-title, .result-header h2, .search-card h2, .result-card h2),
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(
+        .group-pet-name,
+        .left h3,
+        .result-item .left h3,
+        .left p,
+        .chain-text,
+        .empty,
+        .empty-state__title,
+        .empty-state__desc
+    ) {
+    color: var(--tool-page-heading-dark) !important;
+}
+
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .dataset-value,
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .prob,
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .sub-head {
+    color: #e5eefb !important;
+}
+
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .pet-id {
+    color: #dbeafe !important;
+    background: linear-gradient(
+        180deg,
+        rgba(59, 130, 246, 0.2),
+        rgba(30, 41, 59, 0.12)
+    ) !important;
+    border-color: rgba(147, 197, 253, 0.34) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.12),
+        0 8px 18px rgba(2, 6, 23, 0.16) !important;
+}
+
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .el-tag {
+    color: #eaf2ff !important;
+    background: linear-gradient(
+        180deg,
+        rgba(59, 130, 246, 0.18),
+        rgba(148, 163, 184, 0.08)
+    ) !important;
+    border-color: rgba(147, 197, 253, 0.28) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 10px 20px rgba(2, 6, 23, 0.14) !important;
+}
+
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .el-tag
+    .el-tag__close {
+    color: #dbeafe !important;
+}
+
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .el-form-item__label {
+    color: var(--tool-page-heading-dark) !important;
+}
+
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .page-hero__home-btn {
+    border-color: rgba(148, 163, 184, 0.22);
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.14),
+        rgba(148, 163, 184, 0.08)
+    );
+    color: #dbeafe;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.12),
+        0 10px 20px rgba(2, 6, 23, 0.18);
+}
+
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .page-hero__home-btn:hover {
+    border-color: rgba(148, 163, 184, 0.3);
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.18),
+        rgba(148, 163, 184, 0.1)
+    );
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.16),
+        0 14px 24px rgba(2, 6, 23, 0.22);
+}
+
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(.reset-btn, .submit-btn, .share-btn, .shiny-flow-btn) {
+    background: var(--tool-page-button-dark-bg) !important;
+    color: #dbeafe !important;
+    border-color: var(--tool-page-button-dark-border) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 10px 20px rgba(2, 6, 23, 0.18) !important;
+}
+
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .share-btn {
+    border-style: dashed !important;
+}
+
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .query-btn {
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.28) !important;
+}
+
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(.el-input__wrapper, .el-select__wrapper, .el-select-v2__wrapper) {
+    color: #e5e7eb;
+    box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.2) inset !important;
+}
+
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(
+        .el-input__wrapper:hover,
+        .el-select__wrapper:hover,
+        .el-select-v2__wrapper:hover
+    ) {
+    box-shadow: 0 0 0 1px rgba(147, 197, 253, 0.28) inset !important;
+}
+
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(
+        .el-input__wrapper.is-focus,
+        .el-select__wrapper.is-focused,
+        .el-select-v2__wrapper.is-focused
+    ) {
+    box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.32) inset !important;
+}
+
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(
+        .el-input__inner,
+        .el-select__selected-item,
+        .el-select-v2__selected-item
+    ) {
+    color: #0f172a;
+}
+
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    :is(
+        .el-input__inner::placeholder,
+        .el-select__placeholder,
+        .el-select-v2__placeholder
+    ) {
+    color: #475569;
+}
+
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .el-switch__label {
+    color: #cbd5e1 !important;
+}
+
+.page.theme-dark
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+    .el-radio-button__inner {
+    background: rgba(15, 23, 42, 0.88);
+    border-color: rgba(96, 165, 250, 0.24);
+    color: #cbd5e1;
+}
+
+@media (min-width: 860px) {
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page) .actions {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+        .actions
+        .el-button {
+        flex: 0 0 auto;
+        width: auto;
+        min-width: 132px;
+    }
+
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+        .group-result-list {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+        :is(.page-hero__title-row, .title-row, .result-header) {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+        .page-hero__home-btn {
+        width: 100%;
+    }
+
+    :is(.egg-size-page, .tool-page, .breeding-page, .shiny-page)
+        :is(
+            .search-card,
+            .result-card,
+            .size-hero-card,
+            .breeding-hero-card,
+            .shiny-hero-card
+        ) {
+        padding: 18px !important;
+    }
+}
