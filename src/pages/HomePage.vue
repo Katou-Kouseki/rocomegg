@@ -1,5 +1,5 @@
 <script setup>
-const props = defineProps({
+const { cards } = defineProps({
   cards: {
     type: Array,
     default: () => [
@@ -39,7 +39,7 @@ function openCard(route) {
     <section class="home-tools">
       <div class="home-card-grid">
         <article
-          v-for="(item, index) in props.cards"
+          v-for="(item, index) in cards"
           :key="item.route"
           class="home-tool-card"
           :class="`home-tool-card-${index + 1}`"
@@ -61,6 +61,7 @@ function openCard(route) {
 
 <style scoped>
 .home-page {
+  --home-card-radius: 24px;
   --home-glass-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.14));
   --home-glass-border: rgba(255, 255, 255, 0.24);
   --home-glass-highlight: rgba(255, 255, 255, 0.28);
@@ -76,7 +77,6 @@ function openCard(route) {
 
 .home-tools {
   border-radius: 32px;
-  padding: 8px 0 0;
 }
 
 .home-card-grid {
@@ -88,7 +88,7 @@ function openCard(route) {
 .home-tool-card {
   position: relative;
   overflow: hidden;
-  border-radius: 24px;
+  border-radius: var(--home-card-radius);
   padding: 24px 20px;
   min-height: 248px;
   background: var(--home-glass-bg);
@@ -155,8 +155,6 @@ function openCard(route) {
   border-radius: 999px;
   padding: 12px 18px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.14));
-  color: var(--app-primary, #3f83bd);
-  font-weight: 700;
   cursor: pointer;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.24),
@@ -206,10 +204,15 @@ function openCard(route) {
 :global(.page.theme-dark) .home-tool-button {
   border-color: rgba(96, 165, 250, 0.22);
   background: linear-gradient(180deg, rgba(30, 41, 59, 0.84), rgba(15, 23, 42, 0.72));
-  color: #bfdbfe;
+  color: #e5eefb !important;
   box-shadow:
     inset 0 1px 0 rgba(148, 163, 184, 0.12),
     0 10px 20px rgba(2, 6, 23, 0.24);
+}
+
+:global(.page.theme-dark) .home-tool-button span,
+:global(.page.theme-dark) .home-tool-button .home-tool-arrow {
+  color: #e5eefb !important;
 }
 
 :global(.page.theme-dark) .home-tool-button:hover {
@@ -239,29 +242,42 @@ function openCard(route) {
 
 @media (max-width: 640px) {
   .home-card-grid {
-    gap: 14px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
   }
 
   .home-tool-card {
     min-height: auto;
-    padding: 20px 16px;
-    gap: 12px;
+    padding: 16px 12px;
+    gap: 10px;
+  }
+
+  .home-tool-card-bg {
+    width: 120px;
+    height: 120px;
+    inset: auto -24px -24px auto;
   }
 
   .home-tool-title {
-    font-size: 22px;
-    line-height: 1.35;
+    font-size: 18px;
+    line-height: 1.3;
   }
 
   .home-tool-desc {
-    font-size: 13px;
-    line-height: 1.7;
+    font-size: 12px;
+    line-height: 1.55;
   }
 
   .home-tool-button {
     width: 100%;
     justify-content: center;
-    padding: 12px 16px;
+    padding: 10px 12px;
+    gap: 6px;
+    font-size: 13px;
+  }
+
+  .home-tool-arrow {
+    font-size: 14px;
   }
 }
 </style>

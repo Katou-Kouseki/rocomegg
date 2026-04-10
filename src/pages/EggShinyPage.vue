@@ -1,6 +1,7 @@
 <script setup>
 import GenderMaleIcon from '../components/icons/GenderMaleIcon.vue'
 import GenderFemaleIcon from '../components/icons/GenderFemaleIcon.vue'
+import '../styles/tool-pages.css'
 
 defineProps({
   loadingData: {
@@ -202,10 +203,46 @@ function updateShinyOwnedDraftGender(value) {
           </div>
           <div v-else-if="!shinyResult" class="empty">暂无可规划数据</div>
           <div v-else>
-            <article v-if="shinyResult.routePlan" class="result-item group-summary group-summary-card">
-              <div class="left">
-                <div v-if="shinyFlowSvg" class="shiny-flow-card">
-                  <div class="shiny-flow-wrap shiny-flow-preview-trigger" @click="emit('open-preview')">
+            <div v-if="shinyResult.routePlan" class="shiny-flow-card">
+              <div v-if="shinyFlowSvg" class="shiny-flow-wrap shiny-flow-preview-trigger" @click="emit('open-preview')">
+                <div class="shiny-flow-watermark" aria-hidden="true">
+                  <span>洛克星盘 · 异色路线规划</span>
+                  <span>洛克星盘 · 异色路线规划</span>
+                  <span>洛克星盘 · 异色路线规划</span>
+                  <span>洛克星盘 · 异色路线规划</span>
+                  <span>洛克星盘 · 异色路线规划</span>
+                  <span>洛克星盘 · 异色路线规划</span>
+                  <span>洛克星盘 · 异色路线规划</span>
+                  <span>洛克星盘 · 异色路线规划</span>
+                </div>
+                <div class="shiny-flow-canvas" v-html="shinyFlowSvg"></div>
+              </div>
+
+              <el-dialog
+                :model-value="shinyFlowPreviewVisible"
+                fullscreen
+                append-to-body
+                class="shiny-flow-preview-dialog"
+                :show-close="false"
+                @update:model-value="emit('update:shinyFlowPreviewVisible', $event)"
+              >
+                <template #header>
+                  <div class="shiny-flow-preview-head">
+                    <div class="shiny-flow-preview-title">
+                      <h3 class="group-pet-name">洛克星盘-异色孵化流程图</h3>
+                    </div>
+                    <div class="shiny-flow-action-group">
+                      <button type="button" class="shiny-flow-btn shiny-flow-save-btn" @click="emit('download-flow')">
+                        保存图片
+                      </button>
+                      <button type="button" class="shiny-flow-btn" @click="emit('close-preview')">
+                        关闭
+                      </button>
+                    </div>
+                  </div>
+                </template>
+                <div class="shiny-flow-preview-body">
+                  <div class="shiny-flow-wrap shiny-flow-wrap-preview">
                     <div class="shiny-flow-watermark" aria-hidden="true">
                       <span>洛克星盘 · 异色路线规划</span>
                       <span>洛克星盘 · 异色路线规划</span>
@@ -219,48 +256,8 @@ function updateShinyOwnedDraftGender(value) {
                     <div class="shiny-flow-canvas" v-html="shinyFlowSvg"></div>
                   </div>
                 </div>
-
-                <el-dialog
-                  :model-value="shinyFlowPreviewVisible"
-                  fullscreen
-                  append-to-body
-                  class="shiny-flow-preview-dialog"
-                  :show-close="false"
-                  @update:model-value="emit('update:shinyFlowPreviewVisible', $event)"
-                >
-                  <template #header>
-                    <div class="shiny-flow-preview-head">
-                      <div class="shiny-flow-preview-title">
-                        <h3 class="group-pet-name">洛克星盘-异色孵化流程图</h3>
-                      </div>
-                      <div class="shiny-flow-action-group">
-                        <button type="button" class="shiny-flow-btn shiny-flow-save-btn" @click="emit('download-flow')">
-                          保存图片
-                        </button>
-                        <button type="button" class="shiny-flow-btn" @click="emit('close-preview')">
-                          关闭
-                        </button>
-                      </div>
-                    </div>
-                  </template>
-                  <div class="shiny-flow-preview-body">
-                    <div class="shiny-flow-wrap shiny-flow-wrap-preview">
-                      <div class="shiny-flow-watermark" aria-hidden="true">
-                        <span>洛克星盘 · 异色路线规划</span>
-                        <span>洛克星盘 · 异色路线规划</span>
-                        <span>洛克星盘 · 异色路线规划</span>
-                        <span>洛克星盘 · 异色路线规划</span>
-                        <span>洛克星盘 · 异色路线规划</span>
-                        <span>洛克星盘 · 异色路线规划</span>
-                        <span>洛克星盘 · 异色路线规划</span>
-                        <span>洛克星盘 · 异色路线规划</span>
-                      </div>
-                      <div class="shiny-flow-canvas" v-html="shinyFlowSvg"></div>
-                    </div>
-                  </div>
-                </el-dialog>
-              </div>
-            </article>
+              </el-dialog>
+            </div>
 
             <div v-if="!shinyCandidates.length" class="empty">没有可匹配的异色父系候选</div>
 
@@ -295,259 +292,7 @@ function updateShinyOwnedDraftGender(value) {
 </template>
 
 <style scoped>
-.shiny-page {
-  display: grid;
-  gap: 18px;
-}
 
-.panel {
-  width: min(100%, 1180px);
-  margin: 0 auto;
-}
-
-.search-card,
-.result-card {
-  position: relative;
-  overflow: hidden;
-  border-radius: 28px;
-  padding: 22px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(246, 250, 255, 0.92));
-  border: 1px solid rgba(148, 188, 225, 0.38);
-  box-shadow:
-    0 16px 40px rgba(37, 99, 235, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(14px);
-}
-
-.search-card h2,
-.result-card h2 {
-  margin: 0;
-  color: var(--app-primary, #2563eb);
-}
-
-.shiny-hero-card {
-  position: relative;
-  overflow: hidden;
-  border-radius: 28px;
-  padding: 28px 22px;
-  background:
-    radial-gradient(circle at top right, rgba(96, 165, 250, 0.2), transparent 32%),
-    linear-gradient(135deg, rgba(30, 64, 175, 0.94), rgba(14, 116, 144, 0.92));
-  border: 1px solid rgba(96, 165, 250, 0.3);
-  box-shadow: 0 24px 56px rgba(30, 64, 175, 0.22);
-}
-
-.page-hero__content {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  gap: 14px;
-}
-
-.page-hero__title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-
-.page-hero__title {
-  margin: 0;
-  color: #f8fbff;
-  font-size: clamp(28px, 4vw, 40px);
-  line-height: 1.15;
-  letter-spacing: 0.02em;
-}
-
-.page-hero__desc {
-  margin: 0;
-  max-width: 760px;
-  color: rgba(226, 232, 240, 0.92);
-  line-height: 1.75;
-  font-size: 14px;
-}
-
-.page-hero__home-btn {
-  min-height: 42px;
-  padding: 0 18px;
-  border: 1px solid rgba(186, 230, 253, 0.32);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #f8fbff;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.page-hero__home-btn:hover {
-  transform: translateY(-1px);
-  background: rgba(56, 189, 248, 0.12);
-}
-
-.page.theme-dark .search-card:not(.shiny-hero-card),
-.page.theme-dark .result-card {
-  background: rgba(12, 25, 52, 0.72);
-  box-shadow:
-    0 18px 36px rgba(2, 6, 23, 0.5),
-    inset 0 1px 0 rgba(148, 163, 184, 0.08);
-  border-color: rgba(96, 165, 250, 0.22);
-}
-
-.page.theme-dark .search-card:not(.shiny-hero-card) h2,
-.page.theme-dark .result-card h2,
-.page.theme-dark .result-item .left h3,
-.page.theme-dark .group-pet-name,
-.page.theme-dark .left p,
-.page.theme-dark .chain-text,
-.page.theme-dark .empty {
-  color: #cbd5e1;
-}
-
-.page.theme-dark .result-item {
-  background: #0b1220;
-  border-color: rgba(96, 165, 250, 0.28);
-  box-shadow: 0 12px 28px rgba(2, 6, 23, 0.55);
-}
-
-.page.theme-dark .group-summary {
-  background: linear-gradient(180deg, #111827, #0b1220);
-  border-color: rgba(96, 165, 250, 0.35);
-}
-
-.page.theme-dark .pet-id {
-  color: #bfdbfe;
-  background: #172554;
-  border-color: #1d4ed8;
-}
-
-.title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-
-.actions {
-  display: flex;
-  gap: 10px;
-  flex-direction: column;
-  width: 100%;
-}
-
-.actions :deep(.el-button) {
-  min-width: 120px;
-  flex: 1 1 100%;
-  width: 100%;
-}
-
-.actions :deep(.el-button + .el-button) {
-  margin-left: 0 !important;
-}
-
-.query-btn {
-  border-radius: 999px !important;
-  border: none !important;
-  padding: 12px 28px !important;
-  background: linear-gradient(135deg, var(--app-primary, #3b82f6), var(--app-primary-soft, #60a5fa)) !important;
-  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.22);
-}
-
-.reset-btn {
-  border-radius: 999px !important;
-  border: none !important;
-  padding: 12px 26px !important;
-  background: #eff6ff !important;
-  color: var(--app-primary, #2563eb) !important;
-}
-
-.result-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-  gap: 10px;
-}
-
-.page.theme-dark :deep(.el-input__wrapper) {
-  background: #020617;
-  color: #e5e7eb;
-  box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.2) inset !important;
-}
-
-.page.theme-dark :deep(.el-input__wrapper:hover) {
-  box-shadow: 0 0 0 1px rgba(147, 197, 253, 0.28) inset !important;
-}
-
-.page.theme-dark :deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.32) inset !important;
-}
-
-.page.theme-dark :deep(.el-input__inner) {
-  color: #f1f5f9;
-}
-
-.page.theme-dark :deep(.el-input__inner::placeholder) {
-  color: #94a3b8;
-}
-
-.page.theme-dark :deep(.el-form-item__label) {
-  color: #93c5fd !important;
-}
-
-.empty {
-  text-align: center;
-  color: #6a6880;
-  padding: 28px 10px;
-}
-
-.group-result-list {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
-}
-
-.result-item {
-  border-radius: 16px;
-  background: var(--app-item-bg, #fff);
-  border: 1px solid rgba(148, 188, 225, 0.32);
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.06);
-  padding: 14px;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-
-.group-summary {
-  border: 1px solid rgba(37, 99, 235, 0.2);
-  background: var(--app-item-bg-soft, linear-gradient(180deg, #ffffff, #f7fbff));
-}
-
-.group-summary-card {
-  margin-bottom: 12px;
-}
-
-.group-item {
-  grid-template-columns: 1fr;
-}
-
-.group-pet-name {
-  margin: 0 !important;
-}
-
-.group-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
-}
 
 .left h3 {
   margin: 0 0 8px;
@@ -578,7 +323,8 @@ function updateShinyOwnedDraftGender(value) {
 }
 
 .shiny-flow-card {
-  margin-top: 10px;
+  margin-top: 0;
+  margin-bottom: 12px;
 }
 
 .shiny-flow-action-group {
@@ -614,9 +360,12 @@ function updateShinyOwnedDraftGender(value) {
   position: relative;
   margin-top: 10px;
   overflow: auto;
-  border-radius: 14px;
-  background: rgba(248, 250, 252, 0.9);
-  padding: 12px;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 .shiny-flow-watermark {
@@ -741,7 +490,10 @@ function updateShinyOwnedDraftGender(value) {
 
 .owned-gender-group :deep(.el-radio-button__inner) {
   min-width: 72px;
-  border-radius: 12px;
+  min-height: 42px;
+  border-radius: 12px !important;
+  font-weight: 700;
+  box-shadow: none !important;
 }
 
 .gender-button-label,
@@ -756,38 +508,38 @@ function updateShinyOwnedDraftGender(value) {
 }
 
 .owned-gender-female :deep(.el-radio-button__inner) {
-  color: #dc2626;
-  border-color: #fca5a5;
-  background: #fff1f2;
-}
-
-.owned-gender-female :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
-  color: #fff;
-  background: #ef4444;
-  border-color: #ef4444;
-  box-shadow: -1px 0 0 0 #ef4444;
-}
-
-.owned-gender-male :deep(.el-radio-button__inner) {
-  color: #1d4ed8;
-  border-color: #93c5fd;
-  background: #eff6ff;
-}
-
-.owned-gender-male :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
-  color: #fff;
-  background: #2563eb;
-  border-color: #2563eb;
-  box-shadow: -1px 0 0 0 #2563eb;
-}
-
-.owned-tag-female {
   color: #dc2626 !important;
   border-color: #fca5a5 !important;
   background: #fff1f2 !important;
 }
 
-.owned-tag-male {
+.owned-gender-female :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
+  color: #fff !important;
+  background: #ef4444 !important;
+  border-color: #ef4444 !important;
+  box-shadow: -1px 0 0 0 #ef4444 !important;
+}
+
+.owned-gender-male :deep(.el-radio-button__inner) {
+  color: #1d4ed8 !important;
+  border-color: #93c5fd !important;
+  background: #eff6ff !important;
+}
+
+.owned-gender-male :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
+  color: #fff !important;
+  background: #2563eb !important;
+  border-color: #2563eb !important;
+  box-shadow: -1px 0 0 0 #2563eb !important;
+}
+
+.shiny-page .group-tags .owned-tag-female {
+  color: #dc2626 !important;
+  border-color: #fca5a5 !important;
+  background: #fff1f2 !important;
+}
+
+.shiny-page .group-tags .owned-tag-male {
   color: #1d4ed8 !important;
   border-color: #93c5fd !important;
   background: #eff6ff !important;
@@ -797,12 +549,15 @@ function updateShinyOwnedDraftGender(value) {
   width: 42px !important;
   height: 42px !important;
   min-width: 42px !important;
-  border-radius: 999px !important;
+  min-height: 42px !important;
+  flex: 0 0 42px !important;
+  border-radius: 50% !important;
   padding: 0 !important;
   display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
+  align-items: center !important;
+  justify-content: center !important;
   justify-self: end;
+  aspect-ratio: 1 / 1;
 }
 
 .rank-enter-active,
@@ -838,45 +593,11 @@ function updateShinyOwnedDraftGender(value) {
   }
 }
 
-@media (max-width: 640px) {
-  .page-hero__title-row,
-  .title-row,
-  .result-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
 
-  .page-hero__home-btn {
-    width: 100%;
-  }
-
-  .search-card,
-  .result-card,
-  .shiny-hero-card {
-    padding: 18px;
-  }
-}
 
 @media (min-width: 860px) {
   .grid {
     grid-template-columns: 1fr;
-  }
-
-  .actions {
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-end;
-    gap: 12px;
-  }
-
-  .actions :deep(.el-button) {
-    flex: 0 0 auto;
-    width: auto;
-    min-width: 132px;
-  }
-
-  .group-result-list {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 </style>

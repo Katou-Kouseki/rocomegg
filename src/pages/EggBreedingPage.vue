@@ -1,5 +1,7 @@
 <script setup>
-const props = defineProps({
+import '../styles/tool-pages.css'
+
+defineProps({
   pageTitle: {
     type: String,
     default: '精灵蛋繁殖查询'
@@ -193,93 +195,9 @@ function updateForceShiny(value) {
 </template>
 
 <style scoped>
-.panel {
-  width: min(100%, 1180px);
-  margin: 0 auto;
-}
 
-.breeding-page {
-  display: grid;
-  gap: 18px;
-}
 
-.search-card,
-.result-card {
-  position: relative;
-  overflow: hidden;
-  border-radius: 28px;
-  padding: 22px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(246, 250, 255, 0.92));
-  border: 1px solid rgba(148, 188, 225, 0.38);
-  box-shadow:
-    0 16px 40px rgba(37, 99, 235, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(14px);
-}
 
-.search-card h2,
-.result-card h2 {
-  margin: 0;
-  color: var(--app-primary, #2563eb);
-}
-
-.breeding-hero-card {
-  border-radius: 28px;
-  padding: 28px 22px;
-  background:
-    radial-gradient(circle at top right, rgba(96, 165, 250, 0.2), transparent 32%),
-    linear-gradient(135deg, rgba(30, 64, 175, 0.94), rgba(14, 116, 144, 0.92));
-  border: 1px solid rgba(96, 165, 250, 0.3);
-  box-shadow: 0 24px 56px rgba(30, 64, 175, 0.22);
-}
-
-.page-hero__content {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  gap: 14px;
-}
-
-.page-hero__title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-}
-
-.page-hero__title {
-  margin: 0;
-  color: #f8fbff;
-  font-size: clamp(28px, 4vw, 40px);
-  line-height: 1.15;
-  letter-spacing: 0.02em;
-}
-
-.page-hero__desc {
-  margin: 0;
-  max-width: 760px;
-  color: rgba(226, 232, 240, 0.92);
-  line-height: 1.75;
-  font-size: 14px;
-}
-
-.page-hero__home-btn {
-  min-height: 42px;
-  padding: 0 18px;
-  border: 1px solid rgba(186, 230, 253, 0.32);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #f8fbff;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.page-hero__home-btn:hover {
-  transform: translateY(-1px);
-  background: rgba(56, 189, 248, 0.12);
-}
 
 .grid {
   display: grid;
@@ -310,91 +228,9 @@ function updateForceShiny(value) {
   margin-left: 0 !important;
 }
 
-.query-btn {
-  border-radius: 999px !important;
-  border: none !important;
-  padding: 12px 28px !important;
-  background: linear-gradient(135deg, var(--app-primary, #3b82f6), var(--app-primary-soft, #60a5fa)) !important;
-  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.22);
-}
 
-.reset-btn {
-  border-radius: 999px !important;
-  border: none !important;
-  padding: 12px 26px !important;
-  background: #eff6ff !important;
-  color: var(--app-primary, #2563eb) !important;
-}
 
-.result-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-  gap: 10px;
-}
 
-.page.theme-dark .search-card:not(.breeding-hero-card),
-.page.theme-dark .result-card {
-  background: rgba(12, 25, 52, 0.72);
-  box-shadow:
-    0 18px 36px rgba(2, 6, 23, 0.5),
-    inset 0 1px 0 rgba(148, 163, 184, 0.08);
-  border-color: rgba(96, 165, 250, 0.22);
-}
-
-.page.theme-dark .search-card:not(.breeding-hero-card) h2,
-.page.theme-dark .result-card h2,
-.page.theme-dark .result-item .left h3,
-.page.theme-dark .group-pet-name,
-.page.theme-dark .left p,
-.page.theme-dark .chain-text,
-.page.theme-dark .empty {
-  color: #cbd5e1;
-}
-
-.page.theme-dark .result-item {
-  background: #0b1220;
-  border-color: rgba(96, 165, 250, 0.28);
-  box-shadow: 0 12px 28px rgba(2, 6, 23, 0.55);
-}
-
-.page.theme-dark .group-summary {
-  background: linear-gradient(180deg, #111827, #0b1220);
-  border-color: rgba(96, 165, 250, 0.35);
-}
-
-.page.theme-dark .pet-id {
-  color: #bfdbfe;
-  background: #172554;
-  border-color: #1d4ed8;
-}
-
-.page.theme-dark :deep(.el-input__wrapper) {
-  background: #020617;
-  color: #e5e7eb;
-  box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.2) inset !important;
-}
-
-.page.theme-dark :deep(.el-input__wrapper:hover) {
-  box-shadow: 0 0 0 1px rgba(147, 197, 253, 0.28) inset !important;
-}
-
-.page.theme-dark :deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.32) inset !important;
-}
-
-.page.theme-dark :deep(.el-input__inner) {
-  color: #f1f5f9;
-}
-
-.page.theme-dark :deep(.el-input__inner::placeholder) {
-  color: #94a3b8;
-}
-
-.page.theme-dark :deep(.el-form-item__label) {
-  color: #93c5fd !important;
-}
 
 .empty {
   text-align: center;
@@ -408,32 +244,12 @@ function updateForceShiny(value) {
   gap: 10px;
 }
 
-.result-item {
-  border-radius: 16px;
-  background: var(--app-item-bg, #ffffff);
-  border: 1px solid rgba(148, 188, 225, 0.32);
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.06);
-  padding: 14px;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-
-.group-summary {
-  border: 1px solid rgba(37, 99, 235, 0.2);
-  background: var(--app-item-bg-soft, linear-gradient(180deg, #ffffff, #f7fbff));
-}
-
 .group-summary-card {
   margin-bottom: 12px;
 }
 
 .group-item {
   grid-template-columns: 1fr;
-}
-
-.group-pet-name {
-  margin: 0 !important;
 }
 
 .group-tags {
@@ -444,38 +260,7 @@ function updateForceShiny(value) {
 }
 
 .title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: 8px;
-}
-
-.left h3 {
-  margin: 0 0 8px;
-  color: var(--app-text, #1a1b21);
-  font-size: 18px;
-}
-
-.pet-id {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--app-primary, #2563eb);
-  background: var(--app-tag-bg, #eff6ff);
-  border: 1px solid var(--app-tag-border, #bfdbfe);
-  border-radius: 999px;
-  padding: 3px 9px;
-}
-
-.left p {
-  margin: 3px 0;
-  color: var(--app-text-soft, #5f5d72);
-  font-size: 13px;
-}
-
-.chain-text {
-  margin: 2px 0 4px;
-  color: var(--app-text-muted, #6a6880);
-  font-size: 12px;
 }
 
 .blocked-tip {
@@ -498,35 +283,7 @@ function updateForceShiny(value) {
   transition: transform 0.35s ease;
 }
 
-:deep(.el-form-item__label) {
-  color: var(--app-primary, #1d4ed8) !important;
-  font-weight: 700;
-}
 
-:deep(.el-input__wrapper) {
-  border-radius: 14px;
-  background: #e8e7ef;
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.12) inset !important;
-  min-height: 42px;
-  align-items: center;
-}
-
-:deep(.el-input__wrapper:hover) {
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.16) inset !important;
-}
-
-:deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2) inset !important;
-}
-
-:deep(.el-input__inner) {
-  height: 42px;
-  line-height: 42px;
-}
-
-:deep(.el-input__inner:focus) {
-  outline: none !important;
-}
 
 @media (min-width: 860px) {
   .grid {
@@ -564,21 +321,8 @@ function updateForceShiny(value) {
     align-items: flex-start;
   }
 
-  .page-hero__home-btn {
-    width: 100%;
-  }
+
 }
 
-@media (max-width: 640px) {
-  .page-hero__title-row,
-  .title-row,
-  .result-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
 
-  .page-hero__home-btn {
-    width: 100%;
-  }
-}
 </style>

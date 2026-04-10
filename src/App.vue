@@ -1,5 +1,5 @@
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRoute, useRouter } from 'vue-router'
 import { Search, Refresh, Sunny, Moon, Monitor, House, Bell } from '@element-plus/icons-vue'
@@ -49,12 +49,21 @@ async function getMermaid() {
   return mermaidLib
 }
 
-async function preloadHeavyLibraries() {
-  await Promise.all([
-    getHtml2canvas(),
-    getQRCode(),
-    getMermaid()
-  ])
+async function preloadLibrariesForPage(page) {
+  if (page === 'size') {
+    await Promise.all([
+      getHtml2canvas(),
+      getQRCode()
+    ])
+    return
+  }
+
+  if (page === 'shiny') {
+    await Promise.all([
+      getQRCode(),
+      getMermaid()
+    ])
+  }
 }
 
 const router = useRouter()
@@ -727,6 +736,8 @@ async function onShareLongImage() {
     const footerTitleColor = posterIsDark ? '#e5e7eb' : '#111827'
     const footerTextColor = posterIsDark ? '#cbd5e1' : '#4b5563'
     const footerBorderColor = posterIsDark ? '#334155' : '#e5e7eb'
+    const captureTheme = posterIsDark ? 'dark' : 'light'
+    const captureThemeClass = posterIsDark ? 'theme-dark' : 'theme-light'
 
     const html2canvas = await getHtml2canvas()
     const canvas = await html2canvas(target, {
@@ -736,7 +747,25 @@ async function onShareLongImage() {
       windowWidth: Math.max(document.documentElement.clientWidth, target.scrollWidth),
       windowHeight: Math.max(target.scrollHeight, target.clientHeight),
       scrollX: 0,
-      scrollY: -window.scrollY
+      scrollY: -window.scrollY,
+      onclone: (clonedDoc) => {
+        clonedDoc.documentElement.setAttribute('data-theme', captureTheme)
+        clonedDoc.body?.setAttribute('data-theme', captureTheme)
+        clonedDoc.documentElement.classList.toggle('dark', posterIsDark)
+        clonedDoc.body?.classList.toggle('dark', posterIsDark)
+
+        const clonedPage = clonedDoc.querySelector('.page')
+        clonedPage?.classList.remove('theme-dark', 'theme-light')
+        clonedPage?.classList.add(captureThemeClass)
+
+        const clonedTarget =
+          clonedDoc.querySelector('.share-poster-target') ||
+          clonedDoc.querySelector('.panel') ||
+          clonedDoc.querySelector('.page')
+
+        clonedTarget?.classList.remove('theme-dark', 'theme-light')
+        clonedTarget?.classList.add(captureThemeClass)
+      }
     })
 
     const QRCode = await getQRCode()
@@ -1838,14 +1867,20 @@ function applySharedParamsFromUrl() {
   }
 }
 
+watch(activeTheme, () => {
+  shareImageUrl.value = ''
+})
+
+watch(currentPage, (page) => {
+  preloadLibrariesForPage(page)
+})
+
 onMounted(async () => {
   initThemeMode()
   restoreOfficialActivityState()
-  await Promise.all([
-    loadDataset(),
-    preloadHeavyLibraries()
-  ])
+  await loadDataset()
   applySharedParamsFromUrl()
+  preloadLibrariesForPage(currentPage.value)
 })
 
 onBeforeUnmount(() => {
@@ -2134,7 +2169,7 @@ onBeforeUnmount(() => {
   overflow: hidden;
   max-width: 1180px;
   margin: 0 auto 14px;
-  padding: 28px 22px;
+  padding: 12px 16px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.08));
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 24px;
@@ -2245,26 +2280,31 @@ onBeforeUnmount(() => {
 }
 
 .page.theme-dark .official-activity-badge {
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0.84), rgba(15, 23, 42, 0.72));
-  color: #93c5fd;
-  border-color: rgba(96, 165, 250, 0.28);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(148, 163, 184, 0.08));
+  color: #bfdbfe;
+  border-color: rgba(148, 163, 184, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 10px 20px rgba(2, 6, 23, 0.18);
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
 }
 
 .page.theme-dark .official-activity-close {
-  border-color: rgba(96, 165, 250, 0.22);
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0.84), rgba(15, 23, 42, 0.72));
-  color: #bfdbfe;
+  border-color: rgba(148, 163, 184, 0.22);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(148, 163, 184, 0.08));
+  color: #dbeafe;
   box-shadow:
-    inset 0 1px 0 rgba(148, 163, 184, 0.12),
-    0 10px 20px rgba(2, 6, 23, 0.24);
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 10px 20px rgba(2, 6, 23, 0.18);
 }
 
 .page.theme-dark .official-activity-close:hover {
-  border-color: rgba(96, 165, 250, 0.36);
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0.96), rgba(15, 23, 42, 0.84));
+  border-color: rgba(148, 163, 184, 0.3);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(148, 163, 184, 0.1));
   box-shadow:
-    inset 0 1px 0 rgba(148, 163, 184, 0.14),
-    0 14px 24px rgba(2, 6, 23, 0.28);
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 14px 24px rgba(2, 6, 23, 0.22);
 }
 
 .page.theme-dark .official-activity-link,
@@ -2318,17 +2358,20 @@ onBeforeUnmount(() => {
 }
 
 .page.theme-dark .theme-toggle-btn {
-  border-color: rgba(96, 165, 250, 0.22);
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0.84), rgba(15, 23, 42, 0.72));
-  color: #bfdbfe;
+  border-color: rgba(148, 163, 184, 0.22);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(148, 163, 184, 0.08));
+  color: #dbeafe;
   box-shadow:
-    inset 0 1px 0 rgba(148, 163, 184, 0.12),
-    0 10px 20px rgba(2, 6, 23, 0.22);
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 10px 20px rgba(2, 6, 23, 0.18);
 }
 
 .page.theme-dark .theme-toggle-btn:hover {
-  border-color: rgba(96, 165, 250, 0.36);
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0.96), rgba(15, 23, 42, 0.84));
+  border-color: rgba(148, 163, 184, 0.3);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(148, 163, 184, 0.1));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 14px 24px rgba(2, 6, 23, 0.22);
 }
 
 
