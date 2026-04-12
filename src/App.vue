@@ -17,18 +17,23 @@ import {
     Monitor,
     House,
     Bell,
+    ArrowLeftBold,
 } from "@element-plus/icons-vue";
 import HomePage from "./pages/HomePage.vue";
 import EggSizePage from "./pages/EggSizePage.vue";
 import EggGroupPage from "./pages/EggGroupPage.vue";
 import EggBreedingPage from "./pages/EggBreedingPage.vue";
 import EggShinyPage from "./pages/EggShinyPage.vue";
+import EggAtlasPage from "./pages/EggAtlasPage.vue";
+import SkillAtlasPage from "./pages/SkillAtlasPage.vue";
+import CreatureDetailPage from "./pages/CreatureDetailPage.vue";
 import {
     EGG_GROUP_INPUT,
     SHINY_SEED_PETS,
     NO_BREED_PETS,
     normalizeBreedingName,
 } from "./data/breeding-config";
+import { buildGroupIndex, buildShinyPetSet } from "./data/atlas-utils";
 
 let html2canvasLib = null;
 let qrcodeLib = null;
@@ -244,6 +249,9 @@ const themeIcon = computed(() =>
           : Monitor,
 );
 const showHomeNavButton = computed(() => currentPage.value !== "home");
+const showAtlasBackNavButton = computed(
+    () => currentPage.value === "atlas-detail",
+);
 const showOfficialActivityNavButton = computed(
     () => currentPage.value === "home" && !showOfficialActivity.value,
 );
@@ -535,80 +543,6 @@ function aggregateByPet(rows) {
     return merged.sort((a, b) => b._score - a._score);
 }
 
-function buildGroupIndex(masterNames, evolutionChains) {
-    const groupsByPet = new Map();
-    const stageToBase = new Map();
-    const stageToFinal = new Map();
-    const stageToChainText = new Map();
-    const baseToMembers = new Map();
-    const baseToChain = new Map();
-    const baseToChains = new Map();
-    const allPetNames = new Set(masterNames);
-
-    const addGroup = (pet, group) => {
-        if (!groupsByPet.has(pet)) groupsByPet.set(pet, new Set());
-        groupsByPet.get(pet).add(group);
-    };
-
-    for (const [group, pets] of Object.entries(eggGroupInput)) {
-        for (const pet of pets) {
-            addGroup(pet, group);
-            allPetNames.add(pet);
-        }
-    }
-
-    for (const chain of evolutionChains) {
-        if (!Array.isArray(chain) || chain.length === 0) continue;
-        const names = chain.map((s) => s.name).filter(Boolean);
-        if (!names.length) continue;
-
-        const base = names[0];
-        const final = names[names.length - 1];
-        const chainText = names.join(" → ");
-
-        if (!baseToMembers.has(base)) baseToMembers.set(base, new Set());
-        const memberSet = baseToMembers.get(base);
-        for (const name of names) memberSet.add(name);
-
-        if (!baseToChain.has(base)) baseToChain.set(base, names);
-        if (!baseToChains.has(base)) baseToChains.set(base, []);
-        baseToChains.get(base).push(names);
-
-        for (const name of names) {
-            stageToBase.set(name, base);
-            stageToFinal.set(name, final);
-            stageToChainText.set(name, chainText);
-            allPetNames.add(name);
-        }
-
-        const unionGroups = new Set();
-        for (const name of names) {
-            const gs = groupsByPet.get(name);
-            if (!gs) continue;
-            for (const g of gs) unionGroups.add(g);
-        }
-
-        if (unionGroups.size > 0) {
-            for (const name of names) {
-                if (!groupsByPet.has(name)) groupsByPet.set(name, new Set());
-                const target = groupsByPet.get(name);
-                for (const g of unionGroups) target.add(g);
-            }
-        }
-    }
-
-    return {
-        groupsByPet,
-        stageToBase,
-        stageToFinal,
-        stageToChainText,
-        baseToMembers,
-        baseToChain,
-        baseToChains,
-        allPetNames,
-    };
-}
-
 function extractEggMeasurementRows(eggJson) {
     if (Array.isArray(eggJson?.items)) return eggJson.items;
 
@@ -681,36 +615,17 @@ async function loadDataset() {
         const evolutionChains = Array.isArray(evoJson?.chains)
             ? evoJson.chains
             : [];
-        groupIndex.value = buildGroupIndex(masterNames, evolutionChains);
+        groupIndex.value = buildGroupIndex(
+            masterNames,
+            evolutionChains,
+            eggGroupInput,
+        );
 
-        const shinySet = new Set();
-        const { allPetNames, stageToBase, stageToFinal, baseToChains } =
-            groupIndex.value;
-        for (const rawName of shinySeedPets) {
-            const seedName = normalizeBreedingName(rawName);
-            if (!seedName || !allPetNames.has(seedName)) continue;
-
-            const base = stageToBase.get(seedName) || seedName;
-            const chains = baseToChains.get(base) || [];
-
-            if (chains.length > 0) {
-                for (const chain of chains) {
-                    if (!Array.isArray(chain) || chain.length === 0) continue;
-                    const idx = chain.indexOf(seedName);
-                    if (idx === -1) continue;
-                    for (let i = idx; i < chain.length; i++) {
-                        const name = chain[i];
-                        if (allPetNames.has(name)) shinySet.add(name);
-                    }
-                }
-            }
-
-            if (!shinySet.has(seedName)) {
-                const finalName = stageToFinal.get(seedName) || seedName;
-                if (allPetNames.has(finalName)) shinySet.add(finalName);
-            }
-        }
-        shinyPets.value = shinySet;
+        shinyPets.value = buildShinyPetSet({
+            shinySeedPets: [...shinySeedPets],
+            groupIndex: groupIndex.value,
+            normalizeBreedingName,
+        });
 
         const rows = extractEggMeasurementRows(eggJson);
         rawItems.value = rows
@@ -2231,6 +2146,16 @@ onBeforeUnmount(() => {
                     <el-icon><Bell /></el-icon>
                 </button>
                 <button
+                    v-if="showAtlasBackNavButton"
+                    class="theme-toggle-btn nav-atlas-back-btn"
+                    type="button"
+                    title="返回图鉴"
+                    aria-label="返回图鉴"
+                    @click="navigateTo('atlas')"
+                >
+                    <el-icon><ArrowLeftBold /></el-icon>
+                </button>
+                <button
                     v-if="showHomeNavButton"
                     class="theme-toggle-btn nav-home-btn"
                     type="button"
@@ -2282,6 +2207,10 @@ onBeforeUnmount(() => {
         </section>
 
         <HomePage v-if="currentPage === 'home'" @navigate="navigateTo" />
+
+        <EggAtlasPage v-if="currentPage === 'atlas'" />
+        <CreatureDetailPage v-if="currentPage === 'atlas-detail'" />
+        <SkillAtlasPage v-if="currentPage === 'skills'" />
 
         <EggSizePage
             v-if="currentPage === 'size'"
@@ -2515,6 +2444,7 @@ onBeforeUnmount(() => {
 }
 
 .nav-home-btn,
+.nav-atlas-back-btn,
 .official-activity-toggle-btn {
     color: var(--app-primary);
 }

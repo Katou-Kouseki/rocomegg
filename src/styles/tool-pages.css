@@ -582,7 +582,7 @@
         .empty-state__title,
         .empty-state__desc
     ) {
-    color: var(--tool-page-heading-dark) !important;
+    color: #ffffff !important;
 }
 
 .page.theme-dark
