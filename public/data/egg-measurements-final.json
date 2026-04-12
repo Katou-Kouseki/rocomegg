@@ -1,5 +1,5 @@
 {
-  "total": 1118,
+  "total": 1224,
   "totalPets": 212,
   "groups": [
     {
@@ -206,6 +206,21 @@
           "id": 450,
           "eggDiameter": "0.31",
           "eggWeight": "3.98"
+        },
+        {
+          "id": 1133,
+          "eggDiameter": "0.27",
+          "eggWeight": "3.341"
+        },
+        {
+          "id": 1137,
+          "eggDiameter": "0.3",
+          "eggWeight": "3.757"
+        },
+        {
+          "id": 1191,
+          "eggDiameter": "0.27",
+          "eggWeight": "3.264"
         }
       ]
     },
@@ -271,6 +286,11 @@
           "id": 1100,
           "eggDiameter": "0.29",
           "eggWeight": "5.671"
+        },
+        {
+          "id": 1138,
+          "eggDiameter": "0.25",
+          "eggWeight": "4.999"
         }
       ]
     },
@@ -280,8 +300,8 @@
       "rangeItems": [
         {
           "id": 252,
-          "eggDiameter": "0.17-0.21",
-          "eggWeight": "1.127-1.789"
+          "eggDiameter": "0.16-0.21",
+          "eggWeight": "1.011-1.789"
         }
       ],
       "exactItems": [
@@ -324,6 +344,11 @@
           "id": 984,
           "eggDiameter": "0.2",
           "eggWeight": "1.534"
+        },
+        {
+          "id": 1193,
+          "eggDiameter": "0.21",
+          "eggWeight": "1.647"
         }
       ]
     },
@@ -505,8 +530,8 @@
       "rangeItems": [
         {
           "id": 16,
-          "eggDiameter": "0.2-0.25",
-          "eggWeight": "8.18-12.914"
+          "eggDiameter": "0.18-0.25",
+          "eggWeight": "6.556-12.914"
         }
       ],
       "exactItems": [
@@ -549,6 +574,11 @@
           "id": 1110,
           "eggDiameter": "0.2",
           "eggWeight": "8.18"
+        },
+        {
+          "id": 1181,
+          "eggDiameter": "0.18",
+          "eggWeight": "6.556"
         }
       ]
     },
@@ -570,7 +600,7 @@
       "rangeItems": [
         {
           "id": 243,
-          "eggDiameter": "0.156-0.224",
+          "eggDiameter": "0.156-0.23",
           "eggWeight": "1.265-2.08"
         }
       ],
@@ -644,6 +674,11 @@
           "id": 1098,
           "eggDiameter": "0.17",
           "eggWeight": "1.297"
+        },
+        {
+          "id": 1176,
+          "eggDiameter": "0.18",
+          "eggWeight": "1.322"
         }
       ]
     },
@@ -666,7 +701,7 @@
         {
           "id": 116,
           "eggDiameter": "0.13-0.19",
-          "eggWeight": "1.069-1.8"
+          "eggWeight": "1.053-1.8"
         }
       ],
       "exactItems": [
@@ -704,6 +739,21 @@
           "id": 990,
           "eggDiameter": "0.18",
           "eggWeight": "1.61"
+        },
+        {
+          "id": 1134,
+          "eggDiameter": "0.13",
+          "eggWeight": "1.053"
+        },
+        {
+          "id": 1174,
+          "eggDiameter": "0.18",
+          "eggWeight": "1.664"
+        },
+        {
+          "id": 1175,
+          "eggDiameter": "0.15",
+          "eggWeight": "1.352"
         }
       ]
     },
@@ -862,6 +912,11 @@
           "id": 978,
           "eggDiameter": "0.22",
           "eggWeight": "2.962"
+        },
+        {
+          "id": 1165,
+          "eggDiameter": "0.21",
+          "eggWeight": "2.838"
         }
       ]
     },
@@ -917,6 +972,11 @@
           "id": 970,
           "eggDiameter": "0.25",
           "eggWeight": "2.141"
+        },
+        {
+          "id": 1231,
+          "eggDiameter": "0.29",
+          "eggWeight": "2.33"
         }
       ]
     },
@@ -1072,6 +1132,11 @@
           "id": 1096,
           "eggDiameter": "0.16",
           "eggWeight": "1.758"
+        },
+        {
+          "id": 1223,
+          "eggDiameter": "0.2",
+          "eggWeight": "2.259"
         }
       ]
     },
@@ -1333,6 +1398,11 @@
           "id": 964,
           "eggDiameter": "0.19",
           "eggWeight": "0.047"
+        },
+        {
+          "id": 1202,
+          "eggDiameter": "0.16",
+          "eggWeight": "0.036"
         }
       ]
     },
@@ -1418,6 +1488,11 @@
           "id": 1078,
           "eggDiameter": "0.23",
           "eggWeight": "0.368"
+        },
+        {
+          "id": 1185,
+          "eggDiameter": "0.23",
+          "eggWeight": "0.367"
         }
       ]
     },
@@ -1478,6 +1553,11 @@
           "id": 1092,
           "eggDiameter": "0.18",
           "eggWeight": "2.282"
+        },
+        {
+          "id": 1180,
+          "eggDiameter": "0.17",
+          "eggWeight": "1.786"
         }
       ]
     },
@@ -1555,6 +1635,11 @@
           "id": 1117,
           "eggDiameter": "0.22",
           "eggWeight": "1.7"
+        },
+        {
+          "id": 1209,
+          "eggDiameter": "0.25",
+          "eggWeight": "1.925"
         }
       ]
     },
@@ -1612,6 +1697,11 @@
           "id": 921,
           "eggDiameter": "0.34",
           "eggWeight": "3.6"
+        },
+        {
+          "id": 1187,
+          "eggDiameter": "0.34",
+          "eggWeight": "3.597"
         }
       ]
     },
@@ -1715,6 +1805,11 @@
           "id": 1083,
           "eggDiameter": "0.2",
           "eggWeight": "1.268"
+        },
+        {
+          "id": 1215,
+          "eggDiameter": "0.22",
+          "eggWeight": "1.367"
         }
       ]
     },
@@ -1785,6 +1880,21 @@
           "id": 1116,
           "eggDiameter": "0.37",
           "eggWeight": "8.179"
+        },
+        {
+          "id": 1148,
+          "eggDiameter": "0.37",
+          "eggWeight": "8.166"
+        },
+        {
+          "id": 1173,
+          "eggDiameter": "0.42",
+          "eggWeight": "9.09"
+        },
+        {
+          "id": 1192,
+          "eggDiameter": "0.34",
+          "eggWeight": "7.519"
         }
       ]
     },
@@ -1897,8 +2007,8 @@
       "rangeItems": [
         {
           "id": 165,
-          "eggDiameter": "0.35~0.43",
-          "eggWeight": "10.342~13.163"
+          "eggDiameter": "0.34~0.43",
+          "eggWeight": "10.06~13.163"
         }
       ],
       "exactItems": [
@@ -1921,6 +2031,11 @@
           "id": 1015,
           "eggDiameter": "0.35",
           "eggWeight": "10.342"
+        },
+        {
+          "id": 1238,
+          "eggDiameter": "0.34",
+          "eggWeight": "10.06"
         }
       ]
     },
@@ -2006,6 +2121,16 @@
           "id": 1085,
           "eggDiameter": "0.21",
           "eggWeight": "2.007"
+        },
+        {
+          "id": 1146,
+          "eggDiameter": "0.18",
+          "eggWeight": "1.714"
+        },
+        {
+          "id": 1183,
+          "eggDiameter": "0.19",
+          "eggWeight": "1.806"
         }
       ]
     },
@@ -2089,6 +2214,11 @@
           "id": 1113,
           "eggDiameter": "0.3",
           "eggWeight": "2.946"
+        },
+        {
+          "id": 1153,
+          "eggDiameter": "0.24",
+          "eggWeight": "1.906"
         }
       ]
     },
@@ -2196,6 +2326,16 @@
           "id": 657,
           "eggDiameter": "0.63",
           "eggWeight": "25.254"
+        },
+        {
+          "id": 1178,
+          "eggDiameter": "0.48",
+          "eggWeight": "18.955"
+        },
+        {
+          "id": 1190,
+          "eggDiameter": "0.49",
+          "eggWeight": "19.304"
         }
       ]
     },
@@ -2283,6 +2423,11 @@
           "id": 1021,
           "eggDiameter": "0.47",
           "eggWeight": "36.595"
+        },
+        {
+          "id": 1204,
+          "eggDiameter": "0.48",
+          "eggWeight": "37.113"
         }
       ]
     },
@@ -2317,7 +2462,7 @@
         {
           "id": 256,
           "eggDiameter": "0.188-0.28",
-          "eggWeight": "0.84-1.36"
+          "eggWeight": "0.742-1.36"
         }
       ],
       "exactItems": [
@@ -2345,6 +2490,21 @@
           "id": 1108,
           "eggDiameter": "0.22",
           "eggWeight": "0.905"
+        },
+        {
+          "id": 1136,
+          "eggDiameter": "0.2",
+          "eggWeight": "0.742"
+        },
+        {
+          "id": 1155,
+          "eggDiameter": "0.28",
+          "eggWeight": "1.354"
+        },
+        {
+          "id": 1225,
+          "eggDiameter": "0.23",
+          "eggWeight": "0.975"
         }
       ]
     },
@@ -2456,8 +2616,8 @@
       "rangeItems": [
         {
           "id": 1,
-          "eggDiameter": "0.24-0.32",
-          "eggWeight": "13.802-18.659"
+          "eggDiameter": "0.24-0.33",
+          "eggWeight": "13.802-19.425"
         }
       ],
       "exactItems": [
@@ -2505,6 +2665,11 @@
           "id": 1005,
           "eggDiameter": "0.25",
           "eggWeight": "14.402"
+        },
+        {
+          "id": 1199,
+          "eggDiameter": "0.33",
+          "eggWeight": "19.425"
         }
       ]
     },
@@ -2545,7 +2710,7 @@
         {
           "id": 247,
           "eggDiameter": "0.17-0.24",
-          "eggWeight": "4.697-6.646"
+          "eggWeight": "4.651-6.646"
         }
       ],
       "exactItems": [
@@ -2603,6 +2768,16 @@
           "id": 1111,
           "eggDiameter": "0.21",
           "eggWeight": "5.687"
+        },
+        {
+          "id": 1144,
+          "eggDiameter": "0.17",
+          "eggWeight": "4.651"
+        },
+        {
+          "id": 1167,
+          "eggDiameter": "0.23",
+          "eggWeight": "6.376"
         }
       ]
     },
@@ -2659,6 +2834,11 @@
           "id": 1040,
           "eggDiameter": "0.19",
           "eggWeight": "26.967"
+        },
+        {
+          "id": 1201,
+          "eggDiameter": "0.21",
+          "eggWeight": "29.258"
         }
       ]
     },
@@ -2684,7 +2864,13 @@
           "eggWeight": "7.62-14.02"
         }
       ],
-      "exactItems": []
+      "exactItems": [
+        {
+          "id": 1168,
+          "eggDiameter": "0.21",
+          "eggWeight": "9.398"
+        }
+      ]
     },
     {
       "petId": "116",
@@ -2786,6 +2972,16 @@
           "id": 1095,
           "eggDiameter": "0.52",
           "eggWeight": "19.161"
+        },
+        {
+          "id": 1164,
+          "eggDiameter": "0.53",
+          "eggWeight": "19.197"
+        },
+        {
+          "id": 1189,
+          "eggDiameter": "0.46",
+          "eggWeight": "16.542"
         }
       ]
     },
@@ -3206,6 +3402,11 @@
           "id": 924,
           "eggDiameter": "0.19",
           "eggWeight": "1.419"
+        },
+        {
+          "id": 1149,
+          "eggDiameter": "0.2",
+          "eggWeight": "1.583"
         }
       ]
     },
@@ -3303,7 +3504,7 @@
         {
           "id": 70,
           "eggDiameter": "0.22~0.3",
-          "eggWeight": "2.442~3.401"
+          "eggWeight": "0.795~3.401"
         }
       ],
       "exactItems": [
@@ -3356,6 +3557,21 @@
           "id": 993,
           "eggDiameter": "0.22",
           "eggWeight": "2.442"
+        },
+        {
+          "id": 1211,
+          "eggDiameter": "0.25",
+          "eggWeight": "0.795"
+        },
+        {
+          "id": 1212,
+          "eggDiameter": "0.25",
+          "eggWeight": "2.795"
+        },
+        {
+          "id": 1221,
+          "eggDiameter": "0.27",
+          "eggWeight": "3.062"
         }
       ]
     },
@@ -3619,6 +3835,11 @@
           "id": 1061,
           "eggDiameter": "0.23",
           "eggWeight": "14.013"
+        },
+        {
+          "id": 1169,
+          "eggDiameter": "0.22",
+          "eggWeight": "12.914"
         }
       ]
     },
@@ -3710,6 +3931,11 @@
           "id": 966,
           "eggDiameter": "0.32",
           "eggWeight": "3.438"
+        },
+        {
+          "id": 1224,
+          "eggDiameter": "0.27",
+          "eggWeight": "2.952"
         }
       ]
     },
@@ -3750,6 +3976,21 @@
           "id": 1123,
           "eggDiameter": "0.25",
           "eggWeight": "1.517"
+        },
+        {
+          "id": 1140,
+          "eggDiameter": "0.2",
+          "eggWeight": "1.021"
+        },
+        {
+          "id": 1184,
+          "eggDiameter": "0.25",
+          "eggWeight": "1.553"
+        },
+        {
+          "id": 1222,
+          "eggDiameter": "0.24",
+          "eggWeight": "1.42"
         }
       ]
     },
@@ -3760,7 +4001,7 @@
         {
           "id": 281,
           "eggDiameter": "0.25-0.35",
-          "eggWeight": "7.05-9"
+          "eggWeight": "6.904-9"
         }
       ],
       "exactItems": [
@@ -3803,6 +4044,11 @@
           "id": 1035,
           "eggDiameter": "0.34",
           "eggWeight": "8.618"
+        },
+        {
+          "id": 1139,
+          "eggDiameter": "0.25",
+          "eggWeight": "6.904"
         }
       ]
     },
@@ -3812,8 +4058,8 @@
       "rangeItems": [
         {
           "id": 162,
-          "eggDiameter": "0.31-0.42",
-          "eggWeight": "4.309-7.373"
+          "eggDiameter": "0.3-0.42",
+          "eggWeight": "4.1-7.373"
         }
       ],
       "exactItems": [
@@ -3856,6 +4102,16 @@
           "id": 1066,
           "eggDiameter": "0.39",
           "eggWeight": "6.179"
+        },
+        {
+          "id": 1210,
+          "eggDiameter": "0.3",
+          "eggWeight": "4.1"
+        },
+        {
+          "id": 1230,
+          "eggDiameter": "0.31",
+          "eggWeight": "4.315"
         }
       ]
     },
@@ -3906,6 +4162,11 @@
           "id": 737,
           "eggDiameter": "0.26",
           "eggWeight": "1.806"
+        },
+        {
+          "id": 1219,
+          "eggDiameter": "0.25",
+          "eggWeight": "1.725"
         }
       ]
     },
@@ -4049,6 +4310,11 @@
           "id": 1075,
           "eggDiameter": "0.12",
           "eggWeight": "0.41"
+        },
+        {
+          "id": 1170,
+          "eggDiameter": "0.12",
+          "eggWeight": "0.426"
         }
       ]
     },
@@ -4119,6 +4385,11 @@
           "id": 1114,
           "eggDiameter": "0.22",
           "eggWeight": "2.045"
+        },
+        {
+          "id": 1160,
+          "eggDiameter": "0.24",
+          "eggWeight": "2.221"
         }
       ]
     },
@@ -4189,6 +4460,16 @@
           "id": 1030,
           "eggDiameter": "0.28",
           "eggWeight": "2.414"
+        },
+        {
+          "id": 1194,
+          "eggDiameter": "0.22",
+          "eggWeight": "1.847"
+        },
+        {
+          "id": 1208,
+          "eggDiameter": "0.22",
+          "eggWeight": "1.854"
         }
       ]
     },
@@ -4210,8 +4491,8 @@
       "rangeItems": [
         {
           "id": 61,
-          "eggDiameter": "0.28-0.38",
-          "eggWeight": "25.099-34.986"
+          "eggDiameter": "0.27-0.38",
+          "eggWeight": "25.07-34.986"
         }
       ],
       "exactItems": [
@@ -4254,6 +4535,11 @@
           "id": 998,
           "eggDiameter": "0.38",
           "eggWeight": "34.266"
+        },
+        {
+          "id": 1216,
+          "eggDiameter": "0.27",
+          "eggWeight": "25.07"
         }
       ]
     },
@@ -4276,7 +4562,7 @@
         {
           "id": 235,
           "eggDiameter": "0.13-0.17",
-          "eggWeight": "1.395-2.087"
+          "eggWeight": "1.38-2.087"
         }
       ],
       "exactItems": [
@@ -4339,6 +4625,16 @@
           "id": 1082,
           "eggDiameter": "0.14",
           "eggWeight": "1.609"
+        },
+        {
+          "id": 1156,
+          "eggDiameter": "0.13",
+          "eggWeight": "1.38"
+        },
+        {
+          "id": 1235,
+          "eggDiameter": "0.15",
+          "eggWeight": "1.811"
         }
       ]
     },
@@ -4366,7 +4662,7 @@
       "rangeItems": [
         {
           "id": 245,
-          "eggDiameter": "0.164-0.232",
+          "eggDiameter": "0.164-0.24",
           "eggWeight": "2.724-3.76"
         }
       ],
@@ -4425,6 +4721,16 @@
           "id": 1042,
           "eggDiameter": "0.21",
           "eggWeight": "3.326"
+        },
+        {
+          "id": 1171,
+          "eggDiameter": "0.24",
+          "eggWeight": "3.679"
+        },
+        {
+          "id": 1196,
+          "eggDiameter": "0.18",
+          "eggWeight": "2.804"
         }
       ]
     },
@@ -4525,6 +4831,16 @@
           "id": 1105,
           "eggDiameter": "0.17",
           "eggWeight": "4.725"
+        },
+        {
+          "id": 1145,
+          "eggDiameter": "0.19",
+          "eggWeight": "5.25"
+        },
+        {
+          "id": 1188,
+          "eggDiameter": "0.2",
+          "eggWeight": "5.582"
         }
       ]
     },
@@ -4568,6 +4884,21 @@
           "id": 1012,
           "eggDiameter": "0.21",
           "eggWeight": "1.611"
+        },
+        {
+          "id": 1158,
+          "eggDiameter": "0.2",
+          "eggWeight": "1.473"
+        },
+        {
+          "id": 1177,
+          "eggDiameter": "0.24",
+          "eggWeight": "2.176"
+        },
+        {
+          "id": 1205,
+          "eggDiameter": "0.25",
+          "eggWeight": "2.522"
         }
       ]
     },
@@ -4724,6 +5055,26 @@
           "id": 1089,
           "eggDiameter": "0.25",
           "eggWeight": "1.085"
+        },
+        {
+          "id": 1163,
+          "eggDiameter": "0.26",
+          "eggWeight": "1.308"
+        },
+        {
+          "id": 1200,
+          "eggDiameter": "0.28",
+          "eggWeight": "1.455"
+        },
+        {
+          "id": 1214,
+          "eggDiameter": "0.28",
+          "eggWeight": "1.456"
+        },
+        {
+          "id": 1228,
+          "eggDiameter": "0.26",
+          "eggWeight": "1.276"
         }
       ]
     },
@@ -4746,7 +5097,7 @@
         {
           "id": 178,
           "eggDiameter": "0.288-0.38",
-          "eggWeight": "10.414-13.6"
+          "eggWeight": "10.124-13.6"
         }
       ],
       "exactItems": [
@@ -4759,6 +5110,11 @@
           "id": 500,
           "eggDiameter": "0.36",
           "eggWeight": "12.06"
+        },
+        {
+          "id": 1226,
+          "eggDiameter": "0.32",
+          "eggWeight": "10.124"
         }
       ]
     },
@@ -4824,6 +5180,11 @@
           "id": 1093,
           "eggDiameter": "0.22",
           "eggWeight": "2.848"
+        },
+        {
+          "id": 1233,
+          "eggDiameter": "0.25",
+          "eggWeight": "3.326"
         }
       ]
     },
@@ -4879,6 +5240,16 @@
           "id": 1112,
           "eggDiameter": "0.18",
           "eggWeight": "1.095"
+        },
+        {
+          "id": 1150,
+          "eggDiameter": "0.19",
+          "eggWeight": "1.14"
+        },
+        {
+          "id": 1198,
+          "eggDiameter": "0.18",
+          "eggWeight": "1.057"
         }
       ]
     },
@@ -4981,7 +5352,7 @@
         {
           "id": 57,
           "eggDiameter": "0.41~0.45",
-          "eggWeight": "2.572~2.942"
+          "eggWeight": "2.522~2.942"
         }
       ],
       "exactItems": [
@@ -5009,6 +5380,11 @@
           "id": 980,
           "eggDiameter": "0.42",
           "eggWeight": "2.695"
+        },
+        {
+          "id": 1143,
+          "eggDiameter": "0.41",
+          "eggWeight": "2.522"
         }
       ]
     },
@@ -5092,6 +5468,21 @@
           "id": 987,
           "eggDiameter": "0.35",
           "eggWeight": "7.862"
+        },
+        {
+          "id": 1151,
+          "eggDiameter": "0.31",
+          "eggWeight": "7.292"
+        },
+        {
+          "id": 1232,
+          "eggDiameter": "0.27",
+          "eggWeight": "6.615"
+        },
+        {
+          "id": 1237,
+          "eggDiameter": "0.28",
+          "eggWeight": "6.785"
         }
       ]
     },
@@ -5153,6 +5544,21 @@
           "id": 1052,
           "eggDiameter": "0.43",
           "eggWeight": "16.881"
+        },
+        {
+          "id": 1142,
+          "eggDiameter": "0.43",
+          "eggWeight": "17.156"
+        },
+        {
+          "id": 1157,
+          "eggDiameter": "0.43",
+          "eggWeight": "17.093"
+        },
+        {
+          "id": 1161,
+          "eggDiameter": "0.43",
+          "eggWeight": "16.956"
         }
       ]
     },
@@ -5364,7 +5770,7 @@
         {
           "id": 627,
           "eggDiameter": "0.28-0.31",
-          "eggWeight": "13.081-17.671"
+          "eggWeight": "13.081-18.075"
         }
       ],
       "exactItems": [
@@ -5412,6 +5818,26 @@
           "id": 1119,
           "eggDiameter": "0.3",
           "eggWeight": "16.262"
+        },
+        {
+          "id": 1152,
+          "eggDiameter": "0.31",
+          "eggWeight": "18.032"
+        },
+        {
+          "id": 1172,
+          "eggDiameter": "0.29",
+          "eggWeight": "15.004"
+        },
+        {
+          "id": 1203,
+          "eggDiameter": "0.31",
+          "eggWeight": "18.075"
+        },
+        {
+          "id": 1229,
+          "eggDiameter": "0.31",
+          "eggWeight": "17.749"
         }
       ]
     },
@@ -5529,7 +5955,7 @@
         {
           "id": 38,
           "eggDiameter": "0.13-0.18",
-          "eggWeight": "0.437-0.598"
+          "eggWeight": "0.425-0.598"
         }
       ],
       "exactItems": [
@@ -5557,6 +5983,16 @@
           "id": 407,
           "eggDiameter": "0.18",
           "eggWeight": "0.598"
+        },
+        {
+          "id": 1182,
+          "eggDiameter": "0.14",
+          "eggWeight": "0.472"
+        },
+        {
+          "id": 1213,
+          "eggDiameter": "0.13",
+          "eggWeight": "0.425"
         }
       ]
     },
@@ -5700,6 +6136,11 @@
           "id": 1124,
           "eggDiameter": "0.28",
           "eggWeight": "14.288"
+        },
+        {
+          "id": 1206,
+          "eggDiameter": "0.23",
+          "eggWeight": "12.015"
         }
       ]
     },
@@ -5858,6 +6299,11 @@
           "id": 1132,
           "eggDiameter": "0.28",
           "eggWeight": "4.829"
+        },
+        {
+          "id": 1141,
+          "eggDiameter": "0.26",
+          "eggWeight": "4.61"
         }
       ]
     },
@@ -5943,6 +6389,16 @@
           "id": 1079,
           "eggDiameter": "0.43",
           "eggWeight": "2.248"
+        },
+        {
+          "id": 1166,
+          "eggDiameter": "0.21",
+          "eggWeight": "1.977"
+        },
+        {
+          "id": 1186,
+          "eggDiameter": "0.24",
+          "eggWeight": "2.431"
         }
       ]
     },
@@ -5988,6 +6444,11 @@
           "id": 1080,
           "eggDiameter": "0.18",
           "eggWeight": "1.391"
+        },
+        {
+          "id": 1218,
+          "eggDiameter": "0.16",
+          "eggWeight": "1.102"
         }
       ]
     },
@@ -6091,6 +6552,26 @@
           "id": 1059,
           "eggDiameter": "0.17",
           "eggWeight": "1.703"
+        },
+        {
+          "id": 1154,
+          "eggDiameter": "0.22",
+          "eggWeight": "2.606"
+        },
+        {
+          "id": 1197,
+          "eggDiameter": "0.23",
+          "eggWeight": "2.813"
+        },
+        {
+          "id": 1207,
+          "eggDiameter": "0.2",
+          "eggWeight": "2.346"
+        },
+        {
+          "id": 1220,
+          "eggDiameter": "0.18",
+          "eggWeight": "1.833"
         }
       ]
     },
@@ -6245,6 +6726,11 @@
           "id": 1045,
           "eggDiameter": "0.17",
           "eggWeight": "1.288"
+        },
+        {
+          "id": 1179,
+          "eggDiameter": "0.22",
+          "eggWeight": "1.844"
         }
       ]
     },
@@ -6360,6 +6846,16 @@
           "id": 972,
           "eggDiameter": "0.23",
           "eggWeight": "2.674"
+        },
+        {
+          "id": 1147,
+          "eggDiameter": "0.26",
+          "eggWeight": "3.03"
+        },
+        {
+          "id": 1159,
+          "eggDiameter": "0.23",
+          "eggWeight": "2.658"
         }
       ]
     },
@@ -6465,7 +6961,7 @@
         {
           "id": 27,
           "eggDiameter": "0.36-0.42",
-          "eggWeight": "7.288-13.4"
+          "eggWeight": "6.646-13.4"
         }
       ],
       "exactItems": [
@@ -6523,6 +7019,26 @@
           "id": 818,
           "eggDiameter": "0.42",
           "eggWeight": "12.74"
+        },
+        {
+          "id": 1162,
+          "eggDiameter": "0.4",
+          "eggWeight": "11.021"
+        },
+        {
+          "id": 1195,
+          "eggDiameter": "0.41",
+          "eggWeight": "12.244"
+        },
+        {
+          "id": 1217,
+          "eggDiameter": "0.37",
+          "eggWeight": "7.975"
+        },
+        {
+          "id": 1234,
+          "eggDiameter": "0.36",
+          "eggWeight": "6.646"
         }
       ]
     },
@@ -6661,6 +7177,11 @@
           "id": 1118,
           "eggDiameter": "0.16",
           "eggWeight": "0.565"
+        },
+        {
+          "id": 1135,
+          "eggDiameter": "0.12",
+          "eggWeight": "0.401"
         }
       ]
     },
@@ -6819,6 +7340,11 @@
           "id": 412,
           "eggDiameter": "0.58",
           "eggWeight": "34.25"
+        },
+        {
+          "id": 1236,
+          "eggDiameter": "0.58",
+          "eggWeight": "33.591"
         }
       ]
     },
@@ -6885,6 +7411,11 @@
           "id": 874,
           "eggDiameter": "0.23",
           "eggWeight": "7.005"
+        },
+        {
+          "id": 1227,
+          "eggDiameter": "0.21",
+          "eggWeight": "6.177"
         }
       ]
     },
