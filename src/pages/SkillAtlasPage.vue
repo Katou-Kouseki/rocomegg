@@ -1,6 +1,9 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 import "../styles/tool-pages.css";
+
+const router = useRouter();
 
 const loading = ref(false);
 const errorMessage = ref("");
@@ -181,21 +184,6 @@ const filteredSkills = computed(() => {
     });
 });
 
-const totalSkills = computed(() => skills.value.length);
-const totalFilteredSkills = computed(() => filteredSkills.value.length);
-const totalResolvedLearners = computed(() =>
-    skills.value.reduce(
-        (sum, item) => sum + Number(item.resolvedLearnerCount || 0),
-        0,
-    ),
-);
-const totalUnmatchedLearners = computed(() =>
-    skills.value.reduce(
-        (sum, item) => sum + Number(item.unmatchedLearnerCount || 0),
-        0,
-    ),
-);
-
 function applySearch() {
     searchKeyword.value = String(searchDraft.value || "").trim();
 }
@@ -206,6 +194,15 @@ function resetFilters() {
     selectedAttribute.value = "";
     selectedCategory.value = "";
     learnerCountMode.value = "";
+}
+
+function openSkillDetail(item) {
+    const skillId = String(item?.skillId || "").trim();
+    if (!skillId) return;
+
+    router.push({
+        path: `/skills/${skillId}`,
+    });
 }
 
 function getLearnerPreviewNames(item) {
@@ -259,30 +256,6 @@ onMounted(() => {
             <div class="skill-filter-toolbar">
                 <div class="page-hero__title-row">
                     <h1 class="page-hero__title">技能图鉴</h1>
-                </div>
-                <div class="page-hero__meta">
-                    技能总数：<span class="dataset-value">{{
-                        totalSkills
-                    }}</span>
-                    <span class="skill-hero-divider">·</span>
-                    当前显示：<span class="dataset-value">{{
-                        totalFilteredSkills
-                    }}</span>
-                    <span class="skill-hero-divider">·</span>
-                    已关联学习记录：<span class="dataset-value">{{
-                        totalResolvedLearners
-                    }}</span>
-                    <span
-                        v-if="totalUnmatchedLearners > 0"
-                        class="skill-hero-divider"
-                    >
-                        ·
-                    </span>
-                    <template v-if="totalUnmatchedLearners > 0">
-                        未匹配记录：<span class="dataset-value">{{
-                            totalUnmatchedLearners
-                        }}</span>
-                    </template>
                 </div>
 
                 <div class="skill-filter-grid">
@@ -371,6 +344,11 @@ onMounted(() => {
                     v-for="item in filteredSkills"
                     :key="item.skillId"
                     class="skill-card"
+                    role="button"
+                    tabindex="0"
+                    @click="openSkillDetail(item)"
+                    @keyup.enter="openSkillDetail(item)"
+                    @keyup.space.prevent="openSkillDetail(item)"
                 >
                     <div class="skill-icon-wrap">
                         <img
@@ -405,11 +383,6 @@ onMounted(() => {
 .skill-atlas-page {
     width: min(100%, 1180px);
     margin: 0 auto;
-}
-
-.skill-hero-divider {
-    margin: 0 8px;
-    opacity: 0.55;
 }
 
 .skill-filter-toolbar {
@@ -490,23 +463,39 @@ onMounted(() => {
 
 .skill-card {
     border-radius: 16px;
-    border: 1px solid rgba(148, 163, 184, 0.18);
-    background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.8),
-        rgba(255, 255, 255, 0.6)
-    );
+    border: 1px solid
+        color-mix(in srgb, var(--app-border, #bfdbfe) 42%, transparent);
     box-shadow:
         0 10px 24px rgba(15, 23, 42, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
     padding: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
     text-align: center;
+    cursor: pointer;
     backdrop-filter: blur(12px) saturate(145%);
     -webkit-backdrop-filter: blur(12px) saturate(145%);
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.skill-card:hover,
+.skill-card:focus-visible {
+    transform: translateY(-2px);
+    border-color: color-mix(
+        in srgb,
+        var(--app-primary, #3b82f6) 32%,
+        transparent
+    );
+    box-shadow:
+        0 14px 28px rgba(15, 23, 42, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.46);
+    outline: none;
 }
 
 .skill-icon-wrap {
@@ -531,12 +520,17 @@ onMounted(() => {
     width: 100%;
     height: 100%;
     border-radius: 18px;
-    border: 1px dashed rgba(59, 130, 246, 0.35);
-    background: linear-gradient(180deg, #f8fbff, #eef5ff);
+    border: 1px dashed
+        color-mix(in srgb, var(--app-primary, #3b82f6) 34%, transparent);
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--app-item-bg, #ffffff) 92%, white 8%),
+        color-mix(in srgb, var(--app-item-bg, #ffffff) 74%, transparent)
+    );
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #64748b;
+    color: var(--app-text-muted, #64748b);
     font-size: 12px;
     font-weight: 700;
 }
@@ -555,25 +549,21 @@ onMounted(() => {
     min-height: 24px;
     padding: 0 10px;
     border-radius: 999px;
-    font-size: 11px;
-    font-weight: 700;
+    font-size: 12px;
+    font-weight: 600;
 }
 
-.skill-tag-attribute {
-    background: rgba(37, 99, 235, 0.1);
-    color: #2563eb;
-}
-
+.skill-tag-attribute,
 .skill-tag-category {
-    background: rgba(14, 165, 233, 0.1);
-    color: #0f766e;
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--tool-page-label-light);
 }
 
 .skill-card-name {
     margin: 0;
     font-size: 18px;
     line-height: 1.25;
-    color: var(--app-title, #1f2937);
+    color: var(--app-text, #1f2937);
     word-break: break-word;
 }
 
@@ -585,8 +575,13 @@ onMounted(() => {
 
 .skill-stat-item {
     border-radius: 14px;
-    border: 1px solid rgba(191, 219, 254, 0.8);
-    background: linear-gradient(180deg, #f8fbff, #eef5ff);
+    border: 1px solid
+        color-mix(in srgb, var(--app-border, #bfdbfe) 65%, transparent);
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--app-item-bg, #ffffff) 92%, white 8%),
+        color-mix(in srgb, var(--app-item-bg, #ffffff) 76%, transparent)
+    );
     padding: 10px 12px;
     display: flex;
     flex-direction: column;
@@ -595,7 +590,7 @@ onMounted(() => {
 
 .skill-stat-label {
     font-size: 12px;
-    color: #64748b;
+    color: var(--app-text-muted, #64748b);
 }
 
 .skill-stat-value {
@@ -606,23 +601,38 @@ onMounted(() => {
 }
 
 :global(.page.theme-dark) .skill-filter-title-wrap p {
-    color: #cbd5e1;
+    color: var(--app-text-soft, #cbd5e1);
+}
+
+:global(.page.theme-dark) .skill-list-card,
+:global(.page.theme-dark) .skill-filter-card {
+    border-color: rgba(148, 163, 184, 0.16);
+    box-shadow:
+        0 18px 36px rgba(2, 6, 23, 0.38),
+        inset 0 1px 0 rgba(148, 163, 184, 0.1);
 }
 
 :global(.page.theme-dark) .skill-card {
-    border-color: rgba(96, 165, 250, 0.18);
+    border-color: rgba(96, 165, 250, 0.22);
     background: linear-gradient(
         180deg,
-        rgba(15, 23, 42, 0.72),
-        rgba(15, 23, 42, 0.56)
+        rgba(15, 23, 42, 0.82),
+        rgba(15, 23, 42, 0.64)
     );
     box-shadow:
         0 12px 28px rgba(2, 6, 23, 0.34),
-        inset 0 1px 0 rgba(148, 163, 184, 0.08);
+        inset 0 1px 0 rgba(148, 163, 184, 0.1);
+}
+
+:global(.page.theme-dark) .skill-card:hover {
+    border-color: rgba(96, 165, 250, 0.34);
+    box-shadow:
+        0 16px 32px rgba(2, 6, 23, 0.42),
+        inset 0 1px 0 rgba(148, 163, 184, 0.14);
 }
 
 :global(.page.theme-dark) .skill-card-name {
-    color: #e5eefb;
+    color: var(--app-text, #e5eefb);
 }
 
 :global(.page.theme-dark) .skill-card-id {
@@ -631,13 +641,29 @@ onMounted(() => {
 }
 
 :global(.page.theme-dark) .skill-tag-attribute {
-    background: rgba(59, 130, 246, 0.2);
+    background: linear-gradient(
+        180deg,
+        rgba(59, 130, 246, 0.24),
+        rgba(30, 41, 59, 0.4)
+    );
     color: #bfdbfe;
+    border-color: rgba(96, 165, 250, 0.3);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 8px 18px rgba(2, 6, 23, 0.18);
 }
 
 :global(.page.theme-dark) .skill-tag-category {
-    background: rgba(20, 184, 166, 0.16);
+    background: linear-gradient(
+        180deg,
+        rgba(20, 184, 166, 0.2),
+        rgba(15, 23, 42, 0.36)
+    );
     color: #99f6e4;
+    border-color: rgba(45, 212, 191, 0.24);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 8px 18px rgba(2, 6, 23, 0.18);
 }
 
 :global(.page.theme-dark) .skill-stat-item {
@@ -646,7 +672,7 @@ onMounted(() => {
         rgba(30, 41, 59, 0.95),
         rgba(15, 23, 42, 0.9)
     );
-    border-color: rgba(96, 165, 250, 0.2);
+    border-color: rgba(96, 165, 250, 0.24);
 }
 
 :global(.page.theme-dark) .skill-stat-label {
@@ -663,8 +689,14 @@ onMounted(() => {
         rgba(30, 41, 59, 0.95),
         rgba(15, 23, 42, 0.9)
     );
-    border-color: rgba(96, 165, 250, 0.26);
+    border-color: rgba(96, 165, 250, 0.3);
     color: #cbd5e1;
+}
+
+:global(.page.theme-dark) .skill-empty :deep(.el-empty__description),
+:global(.page.theme-dark) .skill-loading,
+:global(.page.theme-dark) .skill-alert {
+    color: var(--app-text-soft, #d5deea);
 }
 
 @media (min-width: 768px) {

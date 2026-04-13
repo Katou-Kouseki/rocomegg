@@ -27,6 +27,7 @@ import EggShinyPage from "./pages/EggShinyPage.vue";
 import EggAtlasPage from "./pages/EggAtlasPage.vue";
 import SkillAtlasPage from "./pages/SkillAtlasPage.vue";
 import CreatureDetailPage from "./pages/CreatureDetailPage.vue";
+import SkillDetailPage from "./pages/SkillDetailPage.vue";
 import {
     EGG_GROUP_INPUT,
     SHINY_SEED_PETS,
@@ -250,7 +251,15 @@ const themeIcon = computed(() =>
 );
 const showHomeNavButton = computed(() => currentPage.value !== "home");
 const showAtlasBackNavButton = computed(
-    () => currentPage.value === "atlas-detail",
+    () =>
+        currentPage.value === "atlas-detail" ||
+        currentPage.value === "skill-detail",
+);
+const atlasBackNavTitle = computed(() =>
+    currentPage.value === "skill-detail" ? "返回技能图鉴" : "返回图鉴",
+);
+const atlasBackNavTarget = computed(() =>
+    currentPage.value === "skill-detail" ? "skills" : "atlas",
 );
 const showOfficialActivityNavButton = computed(
     () => currentPage.value === "home" && !showOfficialActivity.value,
@@ -2149,9 +2158,9 @@ onBeforeUnmount(() => {
                     v-if="showAtlasBackNavButton"
                     class="theme-toggle-btn nav-atlas-back-btn"
                     type="button"
-                    title="返回图鉴"
-                    aria-label="返回图鉴"
-                    @click="navigateTo('atlas')"
+                    :title="atlasBackNavTitle"
+                    :aria-label="atlasBackNavTitle"
+                    @click="navigateTo(atlasBackNavTarget)"
                 >
                     <el-icon><ArrowLeftBold /></el-icon>
                 </button>
@@ -2211,6 +2220,7 @@ onBeforeUnmount(() => {
         <EggAtlasPage v-if="currentPage === 'atlas'" />
         <CreatureDetailPage v-if="currentPage === 'atlas-detail'" />
         <SkillAtlasPage v-if="currentPage === 'skills'" />
+        <SkillDetailPage v-if="currentPage === 'skill-detail'" />
 
         <EggSizePage
             v-if="currentPage === 'size'"

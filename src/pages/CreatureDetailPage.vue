@@ -808,6 +808,15 @@ function openEvolutionItem(item) {
     });
 }
 
+function openSkillDetail(skill) {
+    const skillId = String(skill?.skillId || "").trim();
+    if (!skillId) return;
+
+    router.push({
+        path: `/skills/${skillId}`,
+    });
+}
+
 function selectForm(optionKey) {
     const key = String(optionKey || "").trim();
     if (!key || key === selectedFormKey.value) return;
@@ -975,20 +984,18 @@ onMounted(() => {
                                             type="button"
                                             @click="openEvolutionItem(item)"
                                         >
-                                            <div class="gallery-image-wrap">
-                                                <img
-                                                    v-if="item.imageUrl"
-                                                    class="gallery-image"
-                                                    :src="item.imageUrl"
-                                                    :alt="`${item.name} 图像`"
-                                                    loading="lazy"
-                                                />
-                                                <div
-                                                    v-else
-                                                    class="creature-summary-icon-placeholder"
-                                                >
-                                                    暂无图片
-                                                </div>
+                                            <img
+                                                v-if="item.imageUrl"
+                                                class="evolution-card-image"
+                                                :src="item.imageUrl"
+                                                :alt="`${item.name} 图像`"
+                                                loading="lazy"
+                                            />
+                                            <div
+                                                v-else
+                                                class="creature-summary-icon-placeholder evolution-card-placeholder"
+                                            >
+                                                暂无图片
                                             </div>
                                         </button>
 
@@ -1032,10 +1039,12 @@ onMounted(() => {
                         </div>
 
                         <div class="skill-mini-grid">
-                            <article
+                            <button
                                 v-for="skill in section.skills"
                                 :key="`${section.key}:${skill.skillId}`"
                                 class="skill-mini-card"
+                                type="button"
+                                @click="openSkillDetail(skill)"
                             >
                                 <div class="skill-mini-icon-wrap">
                                     <img
@@ -1052,7 +1061,7 @@ onMounted(() => {
                                 <div class="skill-mini-name">
                                     {{ skill.name }}
                                 </div>
-                            </article>
+                            </button>
                         </div>
                     </section>
                 </div>
@@ -1434,46 +1443,47 @@ onMounted(() => {
 }
 
 .evolution-card {
-    border: 1px solid rgba(191, 219, 254, 0.82);
-    background: linear-gradient(180deg, #f8fbff, #eef5ff);
-    border-radius: 20px;
-    padding: 12px;
+    border: none;
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-width: 148px;
-    width: 148px;
+    min-width: auto;
+    width: auto;
     cursor: pointer;
+    box-shadow: none;
+    transition: transform 0.2s ease;
+}
+
+.evolution-card-image {
+    width: 116px;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    display: block;
+    border-radius: 18px;
     transition:
         transform 0.2s ease,
-        box-shadow 0.2s ease,
-        border-color 0.2s ease;
+        filter 0.2s ease,
+        outline-color 0.2s ease;
 }
 
-.evolution-card :deep(.gallery-image-wrap) {
-    width: 100%;
+.evolution-card-placeholder {
+    width: 116px;
     min-height: 116px;
-    padding: 10px;
-    border-radius: 16px;
+    border-radius: 18px;
 }
 
-.evolution-card :deep(.gallery-image) {
-    max-width: 100px;
-}
-
-.evolution-card:hover,
-.evolution-card.is-active {
+.evolution-card:hover .evolution-card-image,
+.evolution-card.is-active .evolution-card-image {
     transform: translateY(-2px);
-    border-color: rgba(96, 165, 250, 0.34);
-    box-shadow: 0 12px 22px rgba(37, 99, 235, 0.12);
+    filter: drop-shadow(0 12px 22px rgba(37, 99, 235, 0.18));
 }
 
-.evolution-card.is-active {
-    background: linear-gradient(
-        135deg,
-        rgba(59, 130, 246, 0.16),
-        rgba(96, 165, 250, 0.2)
-    );
+.evolution-card.is-active .evolution-card-image {
+    outline: 2px solid rgba(96, 165, 250, 0.5);
+    outline-offset: 4px;
 }
 
 .evolution-arrow {
@@ -1536,6 +1546,13 @@ onMounted(() => {
 }
 
 .skill-mini-card {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    color: inherit;
+    font: inherit;
+    text-align: center;
+    cursor: pointer;
     border-radius: 14px;
     border: 1px solid var(--tool-page-card-border);
     background: var(--tool-page-card-bg);
@@ -1548,7 +1565,14 @@ onMounted(() => {
     display: grid;
     justify-items: center;
     gap: 8px;
-    text-align: center;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.skill-mini-card:hover {
+    transform: translateY(-1px);
 }
 
 .skill-mini-icon-wrap {

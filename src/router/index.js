@@ -7,6 +7,7 @@ import EggShinyPage from "../pages/EggShinyPage.vue";
 import EggAtlasPage from "../pages/EggAtlasPage.vue";
 import CreatureDetailPage from "../pages/CreatureDetailPage.vue";
 import SkillAtlasPage from "../pages/SkillAtlasPage.vue";
+import SkillDetailPage from "../pages/SkillDetailPage.vue";
 
 const routes = [
   {
@@ -71,6 +72,14 @@ const routes = [
     component: SkillAtlasPage,
     meta: {
       title: "技能图鉴",
+    },
+  },
+  {
+    path: "/skills/:id",
+    name: "skill-detail",
+    component: SkillDetailPage,
+    meta: {
+      title: "技能详情",
     },
   },
   {

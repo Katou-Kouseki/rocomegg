@@ -236,10 +236,6 @@ const filteredEntries = computed(() => {
     });
 });
 
-const totalCreatures = computed(() => creatures.value.length);
-const totalAtlasTiles = computed(() => atlasEntries.value.length);
-const filteredCount = computed(() => filteredEntries.value.length);
-
 function applySearch() {
     searchKeyword.value = String(searchDraft.value || "").trim();
 }
@@ -332,19 +328,6 @@ onMounted(() => {
                 <div class="page-hero__title-row">
                     <h1 class="page-hero__title">{{ pageTitle }}</h1>
                 </div>
-                <p class="page-hero__meta">
-                    基础精灵：<span class="dataset-value">{{
-                        totalCreatures
-                    }}</span>
-                    <span class="atlas-hero-divider">·</span>
-                    图鉴方格：<span class="dataset-value">{{
-                        totalAtlasTiles
-                    }}</span>
-                    <span class="atlas-hero-divider">·</span>
-                    当前显示：<span class="dataset-value">{{
-                        filteredCount
-                    }}</span>
-                </p>
 
                 <div class="atlas-filter-grid">
                     <div class="atlas-filter-item atlas-filter-item-search">
@@ -497,11 +480,6 @@ onMounted(() => {
 .atlas-filter-card,
 .atlas-list-card {
     overflow: hidden;
-}
-
-.atlas-hero-divider {
-    margin: 0 8px;
-    opacity: 0.55;
 }
 
 .atlas-filter-toolbar {
