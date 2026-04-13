@@ -304,7 +304,7 @@ onMounted(() => {
                                 搜索
                             </el-button>
                             <el-button size="large" @click="resetFilters">
-                                重置筛选
+                                重置
                             </el-button>
                         </div>
                     </div>
@@ -460,6 +460,10 @@ onMounted(() => {
 .skill-search-row :deep(.el-input) {
     flex: 1 1 auto;
     min-width: 0;
+}
+
+.skill-search-row :deep(.el-button + .el-button) {
+    margin-left: 0;
 }
 
 .skill-filter-actions {

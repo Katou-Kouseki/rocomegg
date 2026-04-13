@@ -46,11 +46,13 @@ function createAtlasEntry({
     attributes,
     fileName,
     key,
+    formKey,
     formType,
     sortOrder,
 }) {
     return {
         key,
+        formKey,
         id,
         idNumber,
         baseName,
@@ -91,7 +93,13 @@ function buildAtlasEntries(entry) {
         formEntries.length === 0 ||
         !formEntries.some(([label]) => isAtlasNormalForm(baseName, label));
 
-    function pushEntry(name, fileName, suffix, formType = "normal") {
+    function pushEntry(
+        name,
+        fileName,
+        suffix,
+        formType = "normal",
+        formKey = "default",
+    ) {
         if (!fileName) return;
         const key = `${id}:${suffix}:${fileName}:${name}`;
         if (usedKeys.has(key)) return;
@@ -105,6 +113,7 @@ function buildAtlasEntries(entry) {
                 attributes,
                 fileName,
                 key,
+                formKey,
                 formType,
                 sortOrder: orderIndex++,
             }),
@@ -112,7 +121,13 @@ function buildAtlasEntries(entry) {
     }
 
     if (shouldShowBaseCard) {
-        pushEntry(baseName, defaultFile || baseFile, "base", "normal");
+        pushEntry(
+            baseName,
+            defaultFile || baseFile,
+            "base",
+            "normal",
+            "default",
+        );
     }
 
     formEntries.forEach(([label, fileName]) => {
@@ -121,13 +136,20 @@ function buildAtlasEntries(entry) {
             fileName,
             `form:${label}`,
             inferFormType(baseName, label),
+            `form:${label}`,
         );
     });
 
     Object.entries(bossFormsMap)
         .filter(([, fileName]) => fileName)
         .forEach(([label, fileName]) => {
-            pushEntry(label, fileName, `boss:${label}`, "boss");
+            pushEntry(
+                label,
+                fileName,
+                `boss:${label}`,
+                "boss",
+                `boss:${label}`,
+            );
         });
 
     Object.entries(bossFormVariantsMap).forEach(([bossLabel, variantMap]) => {
@@ -139,6 +161,7 @@ function buildAtlasEntries(entry) {
                     fileName,
                     `boss-variant:${bossLabel}:${variantLabel}`,
                     "boss",
+                    `boss-variant:${bossLabel}:${variantLabel}`,
                 );
             });
     });
@@ -231,8 +254,13 @@ function resetFilters() {
 
 function openCreatureDetail(entry) {
     const id = String(entry?.id || "").trim();
+    const form = String(entry?.formKey || "").trim();
     if (!id) return;
-    router.push({ path: `/atlas/${id}` });
+
+    router.push({
+        path: `/atlas/${id}`,
+        query: form ? { form } : undefined,
+    });
 }
 
 async function loadCreatures() {
@@ -337,7 +365,7 @@ onMounted(() => {
                                 搜索
                             </el-button>
                             <el-button size="large" @click="resetFilters">
-                                重置筛选
+                                重置
                             </el-button>
                         </div>
                     </div>
@@ -507,13 +535,17 @@ onMounted(() => {
 .atlas-search-row {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 6px;
     flex-wrap: nowrap;
 }
 
 .atlas-search-row :deep(.el-input) {
     flex: 1 1 auto;
     min-width: 0;
+}
+
+.atlas-search-row :deep(.el-button + .el-button) {
+    margin-left: 0;
 }
 
 .atlas-filter-item-switch {
@@ -553,15 +585,10 @@ onMounted(() => {
 
 .atlas-card {
     border-radius: 16px;
-    border: 1px solid rgba(148, 163, 184, 0.18);
-    background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.78),
-        rgba(255, 255, 255, 0.58)
-    );
+    border: 1px solid var(--tool-page-card-border);
     box-shadow:
-        0 10px 24px rgba(15, 23, 42, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        inset 0 1px 0 var(--tool-page-card-highlight),
+        var(--tool-page-card-shadow);
     padding: 10px;
     display: flex;
     flex-direction: column;
@@ -573,8 +600,8 @@ onMounted(() => {
         transform 0.2s ease,
         box-shadow 0.2s ease,
         border-color 0.2s ease;
-    backdrop-filter: blur(12px) saturate(145%);
-    -webkit-backdrop-filter: blur(12px) saturate(145%);
+    backdrop-filter: var(--tool-page-card-blur);
+    -webkit-backdrop-filter: var(--tool-page-card-blur);
 }
 
 .atlas-card:hover,
@@ -594,8 +621,8 @@ onMounted(() => {
     min-width: 64px;
     padding: 4px 10px;
     border-radius: 999px;
-    background: rgba(63, 131, 189, 0.12);
-    color: var(--app-primary, #3f83bd);
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--tool-page-label-light);
     font-weight: 700;
     font-size: 12px;
 }
@@ -604,8 +631,6 @@ onMounted(() => {
     width: 100%;
     min-height: 92px;
     border-radius: 14px;
-    background: linear-gradient(180deg, #f8fbff, #eef5ff);
-    border: 1px solid rgba(191, 219, 254, 0.8);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -621,7 +646,7 @@ onMounted(() => {
 }
 
 .atlas-image-placeholder {
-    color: #94a3b8;
+    color: var(--app-text-muted);
     font-size: 12px;
 }
 
@@ -629,7 +654,7 @@ onMounted(() => {
     margin: 0;
     font-size: 14px;
     line-height: 1.35;
-    color: var(--app-title, #1f2937);
+    color: var(--app-text, #1a1b21);
     word-break: break-word;
 }
 
@@ -647,53 +672,45 @@ onMounted(() => {
     padding: 0 10px;
     border-radius: 999px;
     background: rgba(59, 130, 246, 0.1);
-    color: #2563eb;
+    color: var(--tool-page-label-light);
     font-size: 12px;
     font-weight: 600;
 }
 
 .atlas-attribute-tag.is-empty {
-    color: #64748b;
+    color: var(--app-text-muted);
     background: rgba(148, 163, 184, 0.12);
 }
 
 :global(.page.theme-dark) .atlas-card {
-    border-color: rgba(96, 165, 250, 0.18);
-    background: linear-gradient(
-        180deg,
-        rgba(15, 23, 42, 0.72),
-        rgba(15, 23, 42, 0.56)
-    );
+    border-color: var(--tool-page-card-dark-border);
+    background: var(--tool-page-card-dark-bg);
     box-shadow:
-        0 12px 28px rgba(2, 6, 23, 0.34),
-        inset 0 1px 0 rgba(148, 163, 184, 0.08);
+        var(--tool-page-card-dark-shadow),
+        inset 0 1px 0 var(--tool-page-card-dark-highlight);
 }
 
 :global(.page.theme-dark) .atlas-card-name {
-    color: #e5eefb;
+    color: var(--tool-page-heading-dark);
 }
 
 :global(.page.theme-dark) .atlas-card-id {
-    background: rgba(96, 165, 250, 0.16);
-    color: #bfdbfe;
+    background: rgba(59, 130, 246, 0.18);
+    color: var(--tool-page-label-dark);
 }
 
 :global(.page.theme-dark) .atlas-main-image-wrap {
-    background: linear-gradient(
-        180deg,
-        rgba(30, 41, 59, 0.95),
-        rgba(15, 23, 42, 0.9)
-    );
-    border-color: rgba(96, 165, 250, 0.2);
+    background: var(--app-item-bg-soft);
+    border-color: var(--tool-page-card-dark-border);
 }
 
 :global(.page.theme-dark) .atlas-attribute-tag {
-    background: rgba(59, 130, 246, 0.2);
-    color: #bfdbfe;
+    background: rgba(59, 130, 246, 0.18);
+    color: var(--tool-page-label-dark);
 }
 
 :global(.page.theme-dark) .atlas-attribute-tag.is-empty {
-    color: #cbd5e1;
+    color: var(--app-text-soft);
     background: rgba(148, 163, 184, 0.12);
 }
 
@@ -732,7 +749,7 @@ onMounted(() => {
 
 @media (max-width: 640px) {
     .atlas-search-row {
-        gap: 8px;
+        gap: 6px;
     }
 
     .atlas-card {

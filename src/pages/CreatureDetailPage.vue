@@ -9,6 +9,7 @@ const route = useRoute();
 const loading = ref(false);
 const errorMessage = ref("");
 const creature = ref(null);
+const creatureMap = ref(new Map());
 const evolutionChains = ref([]);
 const learnsetEntry = ref(null);
 const skillMap = ref(new Map());
@@ -150,35 +151,6 @@ function normalizeLearnset(rawItem) {
     };
 }
 
-const pageTitle = computed(() =>
-    creature.value ? `${creature.value.name} · 精灵详情` : "精灵详情",
-);
-
-const pageDescription = computed(() => {
-    if (!creature.value) {
-        return "查看该精灵的基础资料、全部图鉴、进化链与技能列表。";
-    }
-
-    const parts = [
-        `编号 #${creature.value.id}`,
-        `${totalGalleryCount.value} 张图鉴`,
-    ];
-
-    if (creature.value.attributes.length) {
-        parts.push(
-            creature.value.attributes.map((item) => `${item}系`).join(" / "),
-        );
-    }
-
-    return parts.join(" · ");
-});
-
-const attributeText = computed(() =>
-    creature.value?.attributes?.length
-        ? creature.value.attributes.map((item) => `${item}系`).join(" / ")
-        : "未知属性",
-);
-
 const traitName = computed(
     () => String(creature.value?.trait?.name || "").trim() || "暂无特性",
 );
@@ -248,7 +220,7 @@ const formOptions = computed(() => {
                         stats: normalizeStats(
                             raceStats.bossFormVariants?.[bossLabel]?.[
                                 variantLabel
-                            ],
+                            ] ?? raceStats.bossForms?.[bossLabel],
                         ),
                     });
                 });
@@ -266,122 +238,456 @@ const currentForm = computed(() => {
     return matched || formOptions.value[0];
 });
 
+function formatDisplayName(baseName, formKey, formTitle) {
+    const resolvedBaseName =
+        String(baseName || "未知精灵").trim() || "未知精灵";
+    const parsed = parseFormKey(formKey);
+    const resolvedTitle = String(formTitle || "").trim();
+
+    if (parsed.type === "default") {
+        return resolvedBaseName;
+    }
+
+    if (parsed.type === "form") {
+        return `${resolvedBaseName}·${resolvedTitle || parsed.label || "未命名形态"}`;
+    }
+
+    return resolvedTitle || resolvedBaseName;
+}
+
+const currentDisplayName = computed(() => {
+    if (!creature.value) return "";
+    if (!currentForm.value) return creature.value.name;
+
+    return formatDisplayName(
+        creature.value.name,
+        currentForm.value.key,
+        currentForm.value.title,
+    );
+});
+
 const currentStatItems = computed(() =>
     currentForm.value?.stats ? toStatItems(currentForm.value.stats) : [],
 );
 
+function parseFormKey(rawKey) {
+    const key = String(rawKey || "default").trim() || "default";
+
+    if (key === "default") {
+        return {
+            raw: "default",
+            type: "default",
+            label: "",
+            bossLabel: "",
+            variantLabel: "",
+        };
+    }
+
+    if (key.startsWith("form:")) {
+        return {
+            raw: key,
+            type: "form",
+            label: key.slice(5).trim(),
+            bossLabel: "",
+            variantLabel: "",
+        };
+    }
+
+    if (key.startsWith("boss:")) {
+        return {
+            raw: key,
+            type: "boss",
+            label: key.slice(5).trim(),
+            bossLabel: "",
+            variantLabel: "",
+        };
+    }
+
+    if (key.startsWith("boss-variant:")) {
+        const rest = key.slice(13);
+        const separatorIndex = rest.indexOf(":");
+        const bossLabel =
+            separatorIndex >= 0 ? rest.slice(0, separatorIndex).trim() : "";
+        const variantLabel =
+            separatorIndex >= 0
+                ? rest.slice(separatorIndex + 1).trim()
+                : rest.trim();
+
+        return {
+            raw: key,
+            type: "boss-variant",
+            label: variantLabel,
+            bossLabel,
+            variantLabel,
+        };
+    }
+
+    return {
+        raw: key,
+        type: "unknown",
+        label: key,
+        bossLabel: "",
+        variantLabel: "",
+    };
+}
+
+function getCurrentSkillIds() {
+    if (!learnsetEntry.value) return [];
+
+    const entry = learnsetEntry.value;
+    const selectedKey = String(currentForm.value?.key || "default").trim();
+    const parsed = parseFormKey(selectedKey);
+
+    if (parsed.type === "form") {
+        const formSkills = entry.forms?.[parsed.label];
+        if (Array.isArray(formSkills) && formSkills.length) {
+            return formSkills;
+        }
+    }
+
+    if (parsed.type === "boss") {
+        const bossSkills = entry.bossForms?.[parsed.label];
+        if (Array.isArray(bossSkills) && bossSkills.length) {
+            return bossSkills;
+        }
+    }
+
+    if (parsed.type === "boss-variant") {
+        const variantSkills =
+            entry.bossFormVariants?.[parsed.bossLabel]?.[parsed.variantLabel];
+        if (Array.isArray(variantSkills) && variantSkills.length) {
+            return variantSkills;
+        }
+
+        const bossSkills = entry.bossForms?.[parsed.bossLabel];
+        if (Array.isArray(bossSkills) && bossSkills.length) {
+            return bossSkills;
+        }
+    }
+
+    return Array.isArray(entry.default) ? entry.default : [];
+}
+
 const skillSectionList = computed(() => {
     if (!learnsetEntry.value) return [];
 
-    const skills =
-        Array.isArray(learnsetEntry.value.default) &&
-        learnsetEntry.value.default.length
-            ? learnsetEntry.value.default
-                  .map((skillId) =>
-                      skillMap.value.get(String(skillId || "").trim()),
-                  )
-                  .filter(Boolean)
-            : [];
+    const skills = getCurrentSkillIds()
+        .map((skillId) => skillMap.value.get(String(skillId || "").trim()))
+        .filter(Boolean);
 
-    return skills.length
-        ? [
-              {
-                  key: "default",
-                  title: "基础形态",
-                  skills,
-              },
-          ]
-        : [];
+    if (!skills.length) return [];
+
+    return [
+        {
+            key:
+                String(currentForm.value?.key || "default").trim() || "default",
+            title: currentDisplayName.value || "当前形态",
+            skills,
+        },
+    ];
 });
 
-const evolutionChain = computed(() => {
+function normalizeStageForms(stage, stageName) {
+    const forms = Array.isArray(stage?.forms)
+        ? stage.forms.map((form) => ({
+              key: String(form?.key || "").trim(),
+              name: String(form?.name || "未命名形态").trim(),
+              type: String(form?.type || "").trim(),
+          }))
+        : [];
+
+    const defaultForm = forms.find((form) => form.key === "default") || {
+        key: "default",
+        name: stageName,
+        type: "default",
+    };
+
+    return { forms, defaultForm };
+}
+
+function resolveEvolutionItemImage(stageId, formKey) {
+    const entry = creatureMap.value.get(String(stageId || "").trim());
+
+    if (!entry) return "";
+
+    const key = String(formKey || "default").trim() || "default";
+    const parsed = parseFormKey(key);
+
+    if (parsed.type === "default") {
+        return toImageUrl(entry.images.default || entry.images.base || "");
+    }
+
+    if (parsed.type === "form") {
+        return toImageUrl(entry.images.forms?.[parsed.label] || "");
+    }
+
+    if (parsed.type === "boss") {
+        return toImageUrl(entry.images.bossForms?.[parsed.label] || "");
+    }
+
+    if (parsed.type === "boss-variant") {
+        return toImageUrl(
+            entry.images.bossFormVariants?.[parsed.bossLabel]?.[
+                parsed.variantLabel
+            ] || "",
+        );
+    }
+
+    return toImageUrl(entry.images.default || entry.images.base || "");
+}
+
+function createEvolutionDisplayItem(
+    stageId,
+    stageName,
+    form,
+    selectedKey,
+    isCurrentCreature,
+) {
+    const formKey = String(form?.key || "default").trim() || "default";
+    const rawFormName = String(form?.name || "").trim();
+    const displayName =
+        formKey === "default"
+            ? stageName
+            : formatDisplayName(stageName, formKey, rawFormName || stageName);
+
+    return {
+        id: stageId,
+        name: displayName,
+        imageUrl: resolveEvolutionItemImage(stageId, formKey),
+        active: isCurrentCreature && formKey === selectedKey,
+        isCurrentCreature,
+        formKey,
+    };
+}
+
+function pushEvolutionDisplayItem(
+    result,
+    stageId,
+    stageName,
+    form,
+    selectedKey,
+    isCurrentCreature,
+) {
+    if (!form) return;
+
+    const nextItem = createEvolutionDisplayItem(
+        stageId,
+        stageName,
+        form,
+        selectedKey,
+        isCurrentCreature,
+    );
+    const duplicated = result.some(
+        (item) => item.id === nextItem.id && item.formKey === nextItem.formKey,
+    );
+
+    if (!duplicated) {
+        result.push(nextItem);
+    }
+}
+
+function resolveStageFormForSelection(stage, selectedKey, currentCreatureId) {
+    const stageId = String(stage?.id || "").trim();
+    const stageName = String(stage?.name || "未知精灵").trim();
+    const isCurrentCreature = stageId === currentCreatureId;
+    const parsed = parseFormKey(selectedKey);
+    const { forms, defaultForm } = normalizeStageForms(stage, stageName);
+    const exactMatch = forms.find((form) => form.key === selectedKey);
+    const sameFormMatch =
+        parsed.type === "form" && parsed.label
+            ? forms.find((form) => form.key === `form:${parsed.label}`)
+            : null;
+    const sameBossMatch =
+        parsed.type === "boss" && parsed.label
+            ? forms.find((form) => form.key === `boss:${parsed.label}`)
+            : null;
+    const sameBossVariantMatch =
+        parsed.type === "boss-variant" &&
+        parsed.bossLabel &&
+        parsed.variantLabel
+            ? forms.find(
+                  (form) =>
+                      form.key ===
+                      `boss-variant:${parsed.bossLabel}:${parsed.variantLabel}`,
+              )
+            : null;
+    const relatedFormMatch =
+        parsed.type === "boss-variant" && parsed.variantLabel
+            ? forms.find((form) => form.key === `form:${parsed.variantLabel}`)
+            : null;
+    const relatedBossVariantMatch =
+        parsed.type === "form" && parsed.label
+            ? forms.find((form) => {
+                  const formInfo = parseFormKey(form.key);
+                  return (
+                      formInfo.type === "boss-variant" &&
+                      formInfo.variantLabel === parsed.label
+                  );
+              })
+            : null;
+
+    const result = [];
+
+    if (parsed.type === "default") {
+        pushEvolutionDisplayItem(
+            result,
+            stageId,
+            stageName,
+            defaultForm,
+            "default",
+            isCurrentCreature,
+        );
+
+        forms
+            .filter((form) => form.type === "boss")
+            .forEach((bossForm) => {
+                pushEvolutionDisplayItem(
+                    result,
+                    stageId,
+                    stageName,
+                    bossForm,
+                    "default",
+                    isCurrentCreature,
+                );
+            });
+
+        return result;
+    }
+
+    if (parsed.type === "form") {
+        pushEvolutionDisplayItem(
+            result,
+            stageId,
+            stageName,
+            sameFormMatch || defaultForm,
+            selectedKey,
+            isCurrentCreature,
+        );
+
+        if (sameFormMatch && relatedBossVariantMatch) {
+            pushEvolutionDisplayItem(
+                result,
+                stageId,
+                stageName,
+                relatedBossVariantMatch,
+                selectedKey,
+                isCurrentCreature,
+            );
+        }
+
+        return result;
+    }
+
+    if (parsed.type === "boss") {
+        pushEvolutionDisplayItem(
+            result,
+            stageId,
+            stageName,
+            defaultForm,
+            selectedKey,
+            isCurrentCreature,
+        );
+
+        if (sameBossMatch) {
+            pushEvolutionDisplayItem(
+                result,
+                stageId,
+                stageName,
+                sameBossMatch,
+                selectedKey,
+                isCurrentCreature,
+            );
+        }
+
+        return result;
+    }
+
+    if (parsed.type === "boss-variant") {
+        pushEvolutionDisplayItem(
+            result,
+            stageId,
+            stageName,
+            relatedFormMatch || defaultForm,
+            selectedKey,
+            isCurrentCreature,
+        );
+
+        if (sameBossVariantMatch || exactMatch) {
+            pushEvolutionDisplayItem(
+                result,
+                stageId,
+                stageName,
+                sameBossVariantMatch || exactMatch,
+                selectedKey,
+                isCurrentCreature,
+            );
+        }
+
+        return result;
+    }
+
+    pushEvolutionDisplayItem(
+        result,
+        stageId,
+        stageName,
+        defaultForm,
+        selectedKey,
+        isCurrentCreature,
+    );
+
+    if (exactMatch && exactMatch.key !== "default") {
+        pushEvolutionDisplayItem(
+            result,
+            stageId,
+            stageName,
+            exactMatch,
+            selectedKey,
+            isCurrentCreature,
+        );
+    }
+
+    return result;
+}
+
+const evolutionChainSections = computed(() => {
     if (!creature.value?.id) return [];
+
     const id = creature.value.id;
-    const matchedChain = evolutionChains.value.find((chain) =>
+    const selectedKey =
+        String(currentForm.value?.key || "default").trim() || "default";
+    const matchedChains = evolutionChains.value.filter((chain) =>
         Array.isArray(chain)
             ? chain.some((item) => String(item?.id || "").trim() === id)
             : false,
     );
 
-    return Array.isArray(matchedChain)
-        ? matchedChain.map((item) => ({
-              id: String(item?.id || "").trim(),
-              name: String(item?.name || "未知精灵").trim(),
-              active: String(item?.id || "").trim() === id,
-          }))
-        : [];
+    if (!matchedChains.length) return [];
+
+    return matchedChains
+        .map((chain, index) => ({
+            key: `${id}:chain:${index}`,
+            title:
+                matchedChains.length > 1 ? `进化分支 ${index + 1}` : "进化链",
+            items: chain
+                .flatMap((item) =>
+                    resolveStageFormForSelection(item, selectedKey, id),
+                )
+                .filter(Boolean),
+        }))
+        .filter((section) => section.items.length);
 });
 
-const gallerySections = computed(() => {
-    if (!creature.value) return [];
-
-    const grouped = {
-        base: [],
-        forms: [],
-        boss: [],
-        variants: [],
-    };
-
-    formOptions.value.forEach((item) => {
-        const baseInfo = {
-            key: item.key,
-            title: item.title,
-            fileName: item.fileName,
-            active: item.key === currentForm.value?.key,
-        };
-
-        if (item.type === "default") {
-            grouped.base.push(baseInfo);
-            return;
-        }
-
-        if (item.type === "form") {
-            grouped.forms.push(baseInfo);
-            return;
-        }
-
-        if (item.type === "boss") {
-            grouped.boss.push(baseInfo);
-            return;
-        }
-
-        grouped.variants.push(baseInfo);
-    });
-
-    const sections = [];
-    if (grouped.base.length) {
-        sections.push({
-            key: "base",
-            title: "基础图鉴",
-            items: grouped.base,
-        });
-    }
-    if (grouped.forms.length) {
-        sections.push({
-            key: "forms",
-            title: "地区 / 其它形态",
-            items: grouped.forms,
-        });
-    }
-    if (grouped.boss.length) {
-        sections.push({
-            key: "boss",
-            title: "首领形态",
-            items: grouped.boss,
-        });
-    }
-    if (grouped.variants.length) {
-        sections.push({
-            key: "variants",
-            title: "首领变体",
-            items: grouped.variants,
-        });
+function syncSelectedFormKeyFromRoute() {
+    if (!formOptions.value.length) {
+        selectedFormKey.value = "";
+        return;
     }
 
-    return sections;
-});
+    const routeFormKey = String(route.query.form || "").trim();
+    const matched = formOptions.value.find((item) => item.key === routeFormKey);
 
-const totalGalleryCount = computed(() => formOptions.value.length);
+    selectedFormKey.value = matched?.key || formOptions.value[0]?.key || "";
+}
 
 async function loadCreatureDetail() {
     loading.value = true;
@@ -434,6 +740,12 @@ async function loadCreatureDetail() {
         const creatures = Array.isArray(creatureData?.creatures)
             ? creatureData.creatures
             : [];
+        creatureMap.value = new Map(
+            creatures
+                .map((item) => normalizeCreature(item))
+                .filter((item) => item?.id)
+                .map((item) => [item.id, item]),
+        );
         const matchedCreature = creatures.find(
             (item) => String(item?.id || "").trim() === creatureId,
         );
@@ -454,6 +766,7 @@ async function loadCreatureDetail() {
         const matchedLearnset = learnsets.find(
             (item) => String(item?.creatureId || "").trim() === creatureId,
         );
+
         learnsetEntry.value = matchedLearnset
             ? normalizeLearnset(matchedLearnset)
             : null;
@@ -466,7 +779,7 @@ async function loadCreatureDetail() {
                 .map((item) => [item.skillId, item]),
         );
 
-        selectedFormKey.value = formOptions.value[0]?.key || "";
+        syncSelectedFormKeyFromRoute();
     } catch (error) {
         errorMessage.value =
             error instanceof Error ? error.message : "精灵详情数据加载失败";
@@ -475,24 +788,42 @@ async function loadCreatureDetail() {
     }
 }
 
-function goBackToAtlas() {
-    router.push({ name: "atlas" });
-}
+function openEvolutionItem(item) {
+    const targetId = String(item?.id || "").trim();
+    const targetFormKey = String(item?.formKey || "").trim();
 
-function openCreatureById(id) {
-    const targetId = String(id || "").trim();
     if (!targetId) return;
-    router.push({ path: `/atlas/${targetId}` });
+
+    if (item?.isCurrentCreature) {
+        selectForm(targetFormKey || "default");
+        return;
+    }
+
+    router.push({
+        path: `/atlas/${targetId}`,
+        query:
+            targetFormKey && targetFormKey !== "default"
+                ? { form: targetFormKey }
+                : undefined,
+    });
 }
 
 function selectForm(optionKey) {
     const key = String(optionKey || "").trim();
-    if (!key) return;
+    if (!key || key === selectedFormKey.value) return;
+
     selectedFormKey.value = key;
+    router.replace({
+        path: route.path,
+        query: {
+            ...route.query,
+            form: key,
+        },
+    });
 }
 
 watch(
-    () => creature.value?.name,
+    () => currentDisplayName.value,
     (name) => {
         if (typeof document === "undefined") return;
         document.title = name ? `${name} · 精灵详情` : "精灵详情";
@@ -504,6 +835,14 @@ watch(
     () => route.params.id,
     () => {
         loadCreatureDetail();
+    },
+);
+
+watch(
+    () => route.query.form,
+    () => {
+        if (!formOptions.value.length) return;
+        syncSelectedFormKeyFromRoute();
     },
 );
 
@@ -550,7 +889,7 @@ onMounted(() => {
                             <div class="creature-summary-body">
                                 <div class="creature-summary-title-row">
                                     <h1 class="creature-summary-title">
-                                        {{ creature.name }}
+                                        {{ currentDisplayName }}
                                     </h1>
                                 </div>
 
@@ -608,68 +947,64 @@ onMounted(() => {
 
                         <el-empty v-else description="当前形态暂无种族值数据" />
                     </section>
-                </div>
-            </section>
 
-            <section
-                v-if="formOptions.length > 1"
-                class="search-card creature-form-switch-card"
-            >
-                <div class="section-title-row">
-                    <h2>形态切换</h2>
-                    <span class="section-meta"
-                        >{{ formOptions.length }} 种</span
+                    <section
+                        v-if="evolutionChainSections.length"
+                        class="creature-current-stats-card creature-overview-stats-card"
                     >
-                </div>
+                        <div class="section-title-row">
+                            <h2>进化链</h2>
+                        </div>
 
-                <div class="form-chip-list">
-                    <button
-                        v-for="option in formOptions"
-                        :key="option.key"
-                        class="form-chip"
-                        :class="{
-                            'is-active': option.key === currentForm?.key,
-                        }"
-                        type="button"
-                        @click="selectForm(option.key)"
-                    >
-                        {{ option.title }}
-                    </button>
-                </div>
-            </section>
+                        <div class="skill-section-list">
+                            <section
+                                v-for="section in evolutionChainSections"
+                                :key="section.key"
+                                class="skill-section"
+                            >
+                                <div class="evolution-chain">
+                                    <template
+                                        v-for="(item, index) in section.items"
+                                        :key="`${section.key}:${item.id}:${item.formKey || 'base'}:${item.name}`"
+                                    >
+                                        <button
+                                            class="evolution-card"
+                                            :class="{
+                                                'is-active': item.active,
+                                            }"
+                                            type="button"
+                                            @click="openEvolutionItem(item)"
+                                        >
+                                            <div class="gallery-image-wrap">
+                                                <img
+                                                    v-if="item.imageUrl"
+                                                    class="gallery-image"
+                                                    :src="item.imageUrl"
+                                                    :alt="`${item.name} 图像`"
+                                                    loading="lazy"
+                                                />
+                                                <div
+                                                    v-else
+                                                    class="creature-summary-icon-placeholder"
+                                                >
+                                                    暂无图片
+                                                </div>
+                                            </div>
+                                        </button>
 
-            <section
-                v-if="evolutionChain.length"
-                class="search-card creature-evolution-card"
-            >
-                <div class="section-title-row">
-                    <h2>进化链</h2>
-                    <span class="section-meta"
-                        >{{ evolutionChain.length }} 阶</span
-                    >
-                </div>
-
-                <div class="evolution-chain">
-                    <template
-                        v-for="(item, index) in evolutionChain"
-                        :key="`${item.id}:${item.name}`"
-                    >
-                        <button
-                            class="evolution-card"
-                            :class="{ 'is-active': item.active }"
-                            type="button"
-                            @click="openCreatureById(item.id)"
-                        >
-                            <span class="evolution-id">#{{ item.id }}</span>
-                            <span class="evolution-name">{{ item.name }}</span>
-                        </button>
-                        <span
-                            v-if="index < evolutionChain.length - 1"
-                            class="evolution-arrow"
-                        >
-                            →
-                        </span>
-                    </template>
+                                        <span
+                                            v-if="
+                                                index < section.items.length - 1
+                                            "
+                                            class="evolution-arrow"
+                                        >
+                                            →
+                                        </span>
+                                    </template>
+                                </div>
+                            </section>
+                        </div>
+                    </section>
                 </div>
             </section>
 
@@ -680,9 +1015,9 @@ onMounted(() => {
                 <div class="section-title-row">
                     <div class="creature-panel-head">
                         <span class="creature-panel-kicker">技能面板</span>
-                        <h2>基础形态技能</h2>
+                        <h2>当前形态技能</h2>
                     </div>
-                    <span class="section-meta">仅显示基础形态</span>
+                    <span class="section-meta">随当前形态切换</span>
                 </div>
 
                 <div class="skill-section-list">
@@ -718,55 +1053,6 @@ onMounted(() => {
                                     {{ skill.name }}
                                 </div>
                             </article>
-                        </div>
-                    </section>
-                </div>
-            </section>
-
-            <section class="search-card creature-gallery-card">
-                <div class="section-title-row">
-                    <div class="creature-panel-head">
-                        <span class="creature-panel-kicker">图鉴总览</span>
-                        <h2>全部图鉴</h2>
-                    </div>
-                    <span class="section-meta">{{ totalGalleryCount }} 张</span>
-                </div>
-
-                <div class="gallery-section-list">
-                    <section
-                        v-for="section in gallerySections"
-                        :key="section.key"
-                        class="gallery-section"
-                    >
-                        <div class="gallery-section-head">
-                            <h3>{{ section.title }}</h3>
-                            <span>{{ section.items.length }} 张</span>
-                        </div>
-
-                        <div class="gallery-grid">
-                            <button
-                                v-for="item in section.items"
-                                :key="item.key"
-                                class="gallery-card"
-                                :class="{ 'is-active': item.active }"
-                                type="button"
-                                @click="selectForm(item.key)"
-                            >
-                                <div class="gallery-image-wrap">
-                                    <img
-                                        class="gallery-image"
-                                        :src="toImageUrl(item.fileName)"
-                                        :alt="`${creature.name} ${item.title} 图鉴`"
-                                        loading="lazy"
-                                    />
-                                </div>
-                                <h4 class="gallery-card-title">
-                                    {{ item.title }}
-                                </h4>
-                                <p class="gallery-card-file">
-                                    {{ item.fileName }}
-                                </p>
-                            </button>
                         </div>
                     </section>
                 </div>
@@ -868,7 +1154,6 @@ onMounted(() => {
 .creature-current-stats-card {
     border-radius: var(--tool-page-card-radius);
     border: 1px solid var(--tool-page-card-border);
-    background: var(--tool-page-card-bg);
     box-shadow:
         inset 0 1px 0 var(--tool-page-card-highlight),
         var(--tool-page-card-shadow);
@@ -881,11 +1166,6 @@ onMounted(() => {
 .skill-section {
     border-radius: 22px;
     border: 1px solid rgba(148, 163, 184, 0.18);
-    background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.82),
-        rgba(255, 255, 255, 0.6)
-    );
     box-shadow:
         0 14px 28px rgba(15, 23, 42, 0.08),
         inset 0 1px 0 rgba(255, 255, 255, 0.68);
@@ -1131,15 +1411,38 @@ onMounted(() => {
     gap: 12px;
 }
 
+.evolution-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    min-width: 128px;
+}
+
+.evolution-form-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    max-width: 240px;
+}
+
+.evolution-form-chip {
+    min-height: 32px;
+    padding: 0 12px;
+    font-size: 12px;
+}
+
 .evolution-card {
     border: 1px solid rgba(191, 219, 254, 0.82);
     background: linear-gradient(180deg, #f8fbff, #eef5ff);
-    border-radius: 18px;
-    padding: 14px 16px;
+    border-radius: 20px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    min-width: 128px;
+    align-items: center;
+    min-width: 148px;
+    width: 148px;
     cursor: pointer;
     transition:
         transform 0.2s ease,
@@ -1147,9 +1450,20 @@ onMounted(() => {
         border-color 0.2s ease;
 }
 
+.evolution-card :deep(.gallery-image-wrap) {
+    width: 100%;
+    min-height: 116px;
+    padding: 10px;
+    border-radius: 16px;
+}
+
+.evolution-card :deep(.gallery-image) {
+    max-width: 100px;
+}
+
 .evolution-card:hover,
 .evolution-card.is-active {
-    transform: translateY(-1px);
+    transform: translateY(-2px);
     border-color: rgba(96, 165, 250, 0.34);
     box-shadow: 0 12px 22px rgba(37, 99, 235, 0.12);
 }
@@ -1160,18 +1474,6 @@ onMounted(() => {
         rgba(59, 130, 246, 0.16),
         rgba(96, 165, 250, 0.2)
     );
-}
-
-.evolution-id {
-    font-size: 12px;
-    color: var(--tool-page-desc-color);
-    font-weight: 700;
-}
-
-.evolution-name {
-    font-size: 16px;
-    color: var(--app-text, #1a1b21);
-    font-weight: 800;
 }
 
 .evolution-arrow {
@@ -1235,8 +1537,13 @@ onMounted(() => {
 
 .skill-mini-card {
     border-radius: 14px;
-    border: 1px solid rgba(191, 219, 254, 0.8);
-    background: linear-gradient(180deg, #f8fbff, #eef5ff);
+    border: 1px solid var(--tool-page-card-border);
+    background: var(--tool-page-card-bg);
+    box-shadow:
+        inset 0 1px 0 var(--tool-page-card-highlight),
+        var(--tool-page-card-shadow);
+    backdrop-filter: var(--tool-page-card-blur);
+    -webkit-backdrop-filter: var(--tool-page-card-blur);
     padding: 10px;
     display: grid;
     justify-items: center;
@@ -1249,7 +1556,11 @@ onMounted(() => {
     height: 54px;
     border-radius: 14px;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.72);
+    background: var(
+        --app-item-bg-soft,
+        linear-gradient(180deg, #ffffff, #f7fbff)
+    );
+    border: 1px solid var(--tool-page-secondary-border);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1350,7 +1661,6 @@ onMounted(() => {
 :global(.page.theme-dark) .creature-main-image-wrap,
 :global(.page.theme-dark) .creature-summary-icon-wrap,
 :global(.page.theme-dark) .stat-card,
-:global(.page.theme-dark) .skill-mini-card,
 :global(.page.theme-dark) .gallery-card,
 :global(.page.theme-dark) .evolution-card,
 :global(.page.theme-dark) .form-chip {
@@ -1360,6 +1670,14 @@ onMounted(() => {
         rgba(15, 23, 42, 0.9)
     );
     border-color: rgba(96, 165, 250, 0.2);
+}
+
+:global(.page.theme-dark) .skill-mini-card {
+    border-color: var(--tool-page-card-dark-border);
+    background: var(--tool-page-card-dark-bg);
+    box-shadow:
+        inset 0 1px 0 var(--tool-page-card-dark-highlight),
+        var(--tool-page-card-dark-shadow);
 }
 
 :global(.page.theme-dark) .creature-summary-card,
@@ -1429,10 +1747,20 @@ onMounted(() => {
     color: #cbd5e1;
 }
 
-:global(.page.theme-dark) .gallery-image-wrap,
-:global(.page.theme-dark) .skill-mini-icon-wrap {
+:global(.page.theme-dark) .gallery-image-wrap {
     background: rgba(2, 6, 23, 0.24);
     border-color: rgba(96, 165, 250, 0.16);
+}
+
+:global(.page.theme-dark) .skill-mini-icon-wrap {
+    background: var(--app-item-bg-soft);
+    border-color: var(--tool-page-card-dark-border);
+}
+
+:global(.page.theme-dark) .evolution-form-chip {
+    background: rgba(59, 130, 246, 0.18);
+    color: var(--tool-page-label-dark);
+    border-color: rgba(96, 165, 250, 0.2);
 }
 
 @media (max-width: 960px) {
